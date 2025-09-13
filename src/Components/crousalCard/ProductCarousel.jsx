@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+// import img from '../../../public/caur.png'
 
 const items = [
   {
@@ -60,33 +61,43 @@ const items = [
   },
 ];
 
+
+
 export default function ProductCarousel() {
   const [current, setCurrent] = useState(0);
 
   const slidesPerView = 5; // number of visible cards
   const totalSlides = Math.ceil(items.length / slidesPerView);
 
-  // Auto-slide in one direction
+  // Auto-slide only in one direction (left → right), slower speed
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % totalSlides);
-    }, 4000);
+      setCurrent((prev) => {
+        if (prev === totalSlides - 1) {
+          return 0; // restart when reaching the last slide
+        }
+        return prev + 1;
+      });
+    }, 9000); // 👈 slower: 7 seconds per slide
     return () => clearInterval(timer);
   }, [totalSlides]);
 
   const prevSlide = () => {
-    setCurrent((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
+    setCurrent((prev) => (prev === 0 ? 0 : prev - 1)); // stays if at 0
   };
 
   const nextSlide = () => {
-    setCurrent((prev) => (prev + 1) % totalSlides);
+    setCurrent((prev) => {
+      if (prev === totalSlides - 1) return 0;
+      return prev + 1;
+    });
   };
 
   return (
-    <div className="relative w-full max-w-7xl mx-auto overflow-hidden">
+    <div className="bg-[#fff6d9] relative w-full mx-auto overflow-hidden">
       {/* Slides container */}
       <div
-        className="flex transition-transform duration-700 ease-in-out gap-5"
+        className="flex transition-transform duration-[1500ms] ease-in-out gap-5"
         style={{
           transform: `translateX(-${current * 100}%)`,
           width: `${(items.length / slidesPerView) * 100}%`,
@@ -98,7 +109,7 @@ export default function ProductCarousel() {
             className="flex-shrink-0 p-3"
             style={{ width: `${100 / slidesPerView}%` }}
           >
-            <div className="rounded-lg overflow-hidden shadow bg-[#35e4ff] flex flex-col justify-between p-6 h-50 w-100">
+            <div className="rounded-lg overflow-hidden shadow bg-[url('../../../public/caur.png')] bg-cover bg-center flex flex-col justify-between p-6 h-50 w-100">
               {/* Text Section */}
               <div className="space-y-3">
                 <h2 className="text-lg md:text-xl font-bold text-black leading-snug">

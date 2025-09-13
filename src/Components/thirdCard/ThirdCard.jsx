@@ -38,16 +38,16 @@ const products = [
 
 function ThirCard({img}) {
   return (
-    <div className="bg-[#FFF4CC] min-h-screen py-10">
+    <div className="bg-[#fff6d9]  ">
       <h2 className="text-center text-2xl font-semibold text-black mb-8">
         Today’s Deals
       </h2>
 
-      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 px-4">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2  md:grid-cols-3 lg:grid-cols-4 gap-8 px-4 ">
         {products.map((product) => (
           <div
             key={product.id}
-            className="bg-white rounded-3xl shadow-lg relative p-4 flex flex-col items-center"
+            className="bg-white rounded-3xl shadow-lg relative p-4 flex flex-col items-center mb-5"
           >
             {/* Brand */}
             <div className="absolute -top-5 bg-white px-3 py-1 rounded-full shadow">
@@ -75,7 +75,7 @@ function ThirCard({img}) {
             <img
               src={img}
               alt={product.name}
-              className="w-32 h-32 object-contain mt-4"
+              className="w-42 h-32 object-contain mt-4"
             />
           </div>
         ))}
@@ -84,4 +84,4 @@ function ThirCard({img}) {
   );
 }
 
-export default ThirCard
+export default ThirCard;

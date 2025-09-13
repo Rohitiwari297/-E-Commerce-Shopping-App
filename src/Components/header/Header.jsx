@@ -66,7 +66,7 @@ function Header() {
             {/* Categories Dropdown */}
             {categoriesOpen && (
               <div className="absolute top-10 left-0 w-60 bg-white shadow-lg rounded-md p-3 z-50">
-                <ul className="flex flex-col gap-2">
+                <ul className="flex flex-col gap-2 h-60 overflow-y-auto w-auto">
                   {categories.map((cat, idx) => (
                     <li
                       key={idx}

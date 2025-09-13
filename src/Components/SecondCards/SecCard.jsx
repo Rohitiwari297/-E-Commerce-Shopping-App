@@ -82,7 +82,7 @@ const categories = [
 
 function SecCard() {
   return (
-    <div className="bg-[#FFF4CC] min-h-screen py-10">
+    <div className="bg-[#fff6d9] min-h-screen py-10">
       <h2 className="text-center text-2xl font-semibold text-black mb-8">
         Shop By Categories
       </h2>
