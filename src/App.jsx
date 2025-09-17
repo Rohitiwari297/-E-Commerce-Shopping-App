@@ -1,27 +1,33 @@
+import { Route, Routes } from 'react-router-dom';
 import './App.css'
-import Header from './Components/header/Header'
-import Card from './Components/crousalCard/ProductCarousel'
-import SecCard from './Components/SecondCards/SecCard'
-import ThirCard from './Components/thirdCard/ThirdCard'
-import img from '../public/img.jpeg'
-import FourthCard from './Components/FouCard/FourthCard'
-import chalImg from '../public/chal.png'
-import SecCrousal from './Components/secCrousal/SecCrousal'
-import makhana from '../public/makha.png'
+import Header from './Components/header/Header';
+
+import MainRouter from './mainRouter/MainRouter'
+import Login from './pages/Login';
+import Footer from './Components/footer/Footer';
+import Register from './pages/Register';
+import Category from './pages/Category';
+import ProductDetailing from './pages/ProductDetailing';
+
+
 
 function App() {
 
   return (
-    <>
-      <Header/>
-      <Card/>
-      <SecCard/>
-      <FourthCard img={chalImg}/>
-      <ThirCard img={img}/>
-      <SecCrousal img={makhana}/>
-      
-    </>
-  )
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-grow">
+        <Routes>
+          <Route path="/" element={<MainRouter />} />
+          <Route path="/login" element={<Login />} />
+          <Route path='/register' element={<Register/>} />
+          <Route path='/category' element={<Category/>} />
+          <Route path='category/itemDetails' element={<ProductDetailing/>} />
+        </Routes>
+      </main>
+      <Footer />
+    </div>
+  );
 }
 
 export default App

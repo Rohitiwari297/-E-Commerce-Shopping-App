@@ -1,88 +1,92 @@
 import React from 'react'
 import namk from '../../../public/img.jpeg'
+import chal from '../../../public/chal.png'
+import Makha from '../../../public/makha.png'
+import { TbHandFingerRight } from "react-icons/tb";
+
 
 // Categories data
 const categories = [
   {
     id: 1,
     name: "Atta, Rice & Dals",
-    image: "/images/atta-rice.png",
+    image: "../../../public/img.jpeg",
   },
   {
     id: 2,
     name: "Breakfast, Dips & Spreads",
-    image: "/images/breakfast.png",
+    image: "../../../public/chal.png",
   },
   {
     id: 3,
     name: "Masalas, Oils & Dry Fruits",
-    image: "/images/masala.png",
+    image: "../../../public/makha.png",
   },
   {
     id: 4,
     name: "Chips, Biscuits & Namkeens",
-    image: "/images/chips.png",
+    image: "../../../public/img.jpeg",
   },
   {
     id: 5,
     name: "Hot & Cold Beverages",
-    image: "/images/beverages.png",
+    image: "../../../public/chal.png",
   },
   {
     id: 6,
     name: "Instant & Frozen Foods",
-    image: "/images/frozen.png",
+    image: "../../../public/makha.png",
   },
   {
     id: 7,
     name: "Health & Hygiene",
-    image: "/images/hygiene.png",
+    image: "../../../public/img.jpeg",
   },
   {
     id: 8,
     name: "Men's Grooming",
-    image: "/images/grooming.png",
+    image: "../../../public/chal.png",
   },
   {
     id: 9,
     name: "Bath, Body & Hair",
-    image: "/images/bath.png",
+    image: "../../../public/img.jpeg",
   },
   {
     id: 10,
     name: "Beauty & Cosmetics",
-    image: "/images/beauty.png",
+    image: "../../../public/img.jpeg",
   },
   {
     id: 11,
     name: "Detergents & Cleaning",
-    image: "/images/cleaning.png",
+    image: "../../../public/img.jpeg",
   },
   {
     id: 12,
     name: "Kitchen, Pooja & Homeware",
-    image: "/images/kitchen.png",
+    image: "../../../public/chal.png",
   },
   {
     id: 13,
     name: "Chocolate & Mithai",
-    image: "/images/chocolate.png",
+    image: "../../../public/makha.png",
   },
   {
     id: 14,
     name: "Baby Care",
-    image: "/images/baby.png",
+    image: "../../../public/img.jpeg",
   },
   {
     id: 15,
     name: "Pet Care",
-    image: "/images/pet.png",
+    image: "../../../public/chal.png",
   },
 ];
 
 function SecCard() {
   return (
-    <div className="bg-[#fff6d9] min-h-screen py-10">
+    <div className="bg-[#a7d5a7] min-h-screen py-10">
       <h2 className="text-center text-2xl font-semibold text-black mb-8">
         Shop By Categories
       </h2>
@@ -91,10 +95,10 @@ function SecCard() {
         {categories.map((cat) => (
           <div
             key={cat.id}
-            className="bg-[#DFF1FF] rounded-lg shadow hover:scale-105 transition p-4 flex flex-col items-center cursor-pointer"
+            className="bg-[#f1f8fe] rounded-lg shadow hover:scale-105 transition p-4 flex flex-col items-center cursor-pointer"
           >
             <img
-              src={namk}
+              src={cat.image}
               alt={cat.name}
               className="w-24 h-24 object-contain mb-3"
             />

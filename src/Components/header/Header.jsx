@@ -5,7 +5,8 @@ import { FaRegUser } from "react-icons/fa";
 import { IoCartOutline } from "react-icons/io5";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { IoIosArrowDown } from "react-icons/io";
-import img from "../../../public/hel.png"; // replace with your logo
+import img from "../../../public/hel.png"; 
+import { Link, Navigate, useNavigate } from "react-router-dom";
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -31,12 +32,12 @@ function Header() {
   ];
 
   return (
-    <div className="shadow relative">
+    <div className="shadow relative ">
       <div className="container mx-auto">
         <header className="flex items-center justify-between p-4 bg-white w-full">
           {/* Logo */}
-          <div className="flex items-center">
-            <img className="w-20 md:w-28" src={img} alt="logo" />
+          <div className="flex items-center w-[80px]">
+            <img className=" md:w-28" src={img} alt="logo" />
           </div>
 
           {/* Search Bar (desktop) */}
@@ -46,7 +47,7 @@ function Header() {
               type="text"
               placeholder="Search for products, brands and more"
             />
-            <div className="min-w-[40px] flex items-center justify-center h-10 rounded-tr-md rounded-br-md bg-[#0a3b65] text-white cursor-pointer">
+            <div className="min-w-[40px] flex items-center justify-center h-10 rounded-tr-md rounded-br-md bg-[#0c721f] text-white cursor-pointer">
               <IoMdSearch size={20} />
             </div>
           </div>
@@ -55,7 +56,7 @@ function Header() {
           <div className="hidden md:flex items-center gap-8 text-sm lg:text-base relative">
             {/* All Categories with dropdown */}
             <div
-              className="flex items-center gap-2 cursor-pointer hover:text-[#0a3b65] relative"
+              className="flex items-center gap-2 cursor-pointer hover:text-[#0c721f] relative"
               onClick={() => setCategoriesOpen(!categoriesOpen)}
             >
               <TbCategory size={18} />
@@ -67,7 +68,9 @@ function Header() {
             {categoriesOpen && (
               <div className="absolute top-10 left-0 w-60 bg-white shadow-lg rounded-md p-3 z-50">
                 <ul className="flex flex-col gap-2 h-60 overflow-y-auto w-auto">
+                  <Link to='/category'>
                   {categories.map((cat, idx) => (
+                    
                     <li
                       key={idx}
                       className="p-2 hover:bg-gray-100 rounded cursor-pointer"
@@ -75,21 +78,25 @@ function Header() {
                       {cat}
                     </li>
                   ))}
+                
+                  </Link>
+                  {menuOpen}
+                  
                 </ul>
               </div>
             )}
 
             {/* Login */}
-            <div className="flex items-center gap-2 cursor-pointer hover:text-[#0a3b65]">
+            <Link to='/Login' className="flex items-center gap-2 cursor-pointer hover:text-[#0c721f]">
               <FaRegUser size={18} />
               Login
-            </div>
+            </Link>
 
             {/* Cart */}
-            <div className="flex items-center gap-2 cursor-pointer hover:text-[#0a3b65] relative">
+            <div className="flex items-center gap-2 cursor-pointer hover:text-[#0c721f] relative">
               <IoCartOutline size={20} />
               <span>Cart</span>
-              <span className="absolute -top-2 -right-3 bg-[#0A3B65] text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-semibold">
+              <span className="absolute -top-2 -right-3 bg-[#0c721f] text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-semibold">
                 0
               </span>
             </div>
@@ -113,14 +120,14 @@ function Header() {
                 type="text"
                 placeholder="Search..."
               />
-              <div className="min-w-[40px] flex items-center justify-center h-10 rounded-tr-md rounded-br-md bg-[#0a3b65] text-white cursor-pointer">
+              <div className="min-w-[40px] flex items-center justify-center h-10 rounded-tr-md rounded-br-md bg-[#0c721f] text-white cursor-pointer">
                 <IoMdSearch size={20} />
               </div>
             </div>
 
             {/* All Categories mobile */}
             <div
-              className="flex items-center gap-2 cursor-pointer hover:text-[#0a3b65]"
+              className="flex items-center gap-2 cursor-pointer hover:text-[#0c721f]"
               onClick={() => setCategoriesOpen(!categoriesOpen)}
             >
               <TbCategory size={18} />
@@ -141,16 +148,16 @@ function Header() {
             )}
 
             {/* Login */}
-            <div className="flex items-center gap-2 cursor-pointer hover:text-[#0a3b65]">
+            <div className="flex items-center gap-2 cursor-pointer hover:text-[#0c721f]">
               <FaRegUser size={18} />
               Login
             </div>
 
             {/* Cart */}
-            <div className="flex items-center gap-2 cursor-pointer hover:text-[#0a3b65] relative">
+            <div className="flex items-center gap-2 cursor-pointer hover:text-[#0c721f] relative">
               <IoCartOutline size={20} />
               <span>Cart</span>
-              <span className="absolute -top-2 -right-3 bg-[#0A3B65] text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-semibold">
+              <span className="absolute -top-2 -right-3 bg-[#0c721f] text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-semibold">
                 0
               </span>
             </div>
