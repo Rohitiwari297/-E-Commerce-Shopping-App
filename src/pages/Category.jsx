@@ -48,6 +48,7 @@ function Category() {
 
   // send the cart date to the addToCard Slice
   const getCardDetails = (data) => {
+    console.log(" sweet test onClickGetCardDetails :", data);
     dispatch(addToCard(data)); //  correct usage
   };
 
@@ -72,7 +73,13 @@ function Category() {
             />
             <p className="mt-3 text-center font-medium">{cat.name}</p>
 
-            <Link to={`/category/itemDetails/${cat.id}`} className="w-full">
+            <Link
+              to={{
+                pathname: "/category/itemDetails/",
+              }}
+              state={{ id: cat.id, name: cat.name, price: 250, img: cat.image }}
+              className="w-full" 
+            >
               <button
                 onClick={() => getCardDetails(cat)}
                 className="w-full hover:bg-green-800 cursor-pointer h-auto p-1 bg-green-700 border rounded-2xl text-white"
