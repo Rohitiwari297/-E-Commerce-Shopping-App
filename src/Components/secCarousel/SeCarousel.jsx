@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import img from '../../../public/cloth.png'
-import phone from '../../../public/iphone.png'
+import phone from '../../assets/product3.jpg'
 
 
 
@@ -35,6 +35,7 @@ export default function SeCarousel() {
     <div className="bg-[#a7d5a7] relative  max-w-[1400px] mx-auto overflow-hidden">
       {/* Slides */}
       <div
+      
         className="flex transition-transform duration-700 ease-linear "
         style={{ transform: `translateX(-${current * 100}%)` }}
       >
@@ -43,7 +44,7 @@ export default function SeCarousel() {
             <img
               src={phone }
               alt={banner.alt}
-              className="w-full h-[100px] object-cover shadow-2xl" // fixed height
+              className="w-[1300px] h-[150px] object-cover shadow-2xl" // fixed height
             />
           </div>
         ))}

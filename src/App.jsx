@@ -16,7 +16,7 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <Header  />
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<MainRouter />} />
@@ -24,7 +24,7 @@ function App() {
           <Route path='/register' element={<Register/>} />
           <Route path='/category' element={<Category/>} />
           <Route path="/category/itemDetails" element={<ProductDetailing />} />
-          <Route path='/CartPage' element={<CartPage/>} />
+          <Route path='/cartPage' element={<CartPage/>} />
         </Routes>
       </main>
       <Footer />

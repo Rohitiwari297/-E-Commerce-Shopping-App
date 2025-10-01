@@ -19,10 +19,11 @@ function Header() {
   const [categoriesOpen, setCategoriesOpen] = useState(false);
 
   //
-  // const { carts } = useSelector((state) => state.allCards);
-  const {cart} = useSelector((state) => state.dataToCart);
-  console.log("check store:  " , cart)
-
+  const cart = useSelector((state) => state.dataToCart.cart); // items in dataToCart
+  const forthCard = useSelector((state) => state.forthCard.items); // items in addToForthCard slice
+  // console.log("data to cart", forthCard)
+  // Total items for badge
+  const totalItems = cart.length + forthCard.length;
 
   // sample categories
   const categories = [
@@ -43,14 +44,14 @@ function Header() {
     "Pet Care",
   ];
 
-  const AddToCartHandler = (data)=>{
-    console.log(data)
-  }
+  const AddToCartHandler = (data) => {
+    console.log(data);
+  };
 
   return (
-    <div className="shadow relative ">
-      <div className="container mx-auto">
-        <header className="flex items-center justify-between p-4 bg-white w-full">
+    <div className="shadow  sticky top-0 z-50 bg-white">
+      <div className="container mx-auto ">
+        <header className="flex items-center justify-between position-sti p-4 bg-white w-full">
           {/* Logo */}
           <div className="flex items-center w-[80px]">
             <img className=" md:w-28" src={img} alt="logo" />
@@ -112,7 +113,7 @@ function Header() {
             <div className="flex items-center gap-2 cursor-pointer hover:text-[#0c721f] relative">
               <Menu as="div" className="relative inline-block">
                 <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white/10 px-3 py-2 text-sm font-semibold text-black inset-ring-1 inset-ring-white/5 hover:bg-white/20">
-                  <Badge badgeContent={cart.length} color="primary">
+                  <Badge badgeContent={totalItems} color="primary">
                     <IoCartOutline size={20} />
                     Cart
                   </Badge>
@@ -122,35 +123,39 @@ function Header() {
                   />
                 </MenuButton>
 
-                <MenuItems
-                  transition
-                  className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-gray-800 outline-1 -outline-offset-1 outline-white/10 transition data-closed:scale-95 data-closed:transform data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in"
-                >
-                  <div className="py-1">
-                    {cart.map((ele) => (
-                      <MenuItem key={ele.id || ele.name}>
-                        <Link to={'/CartPage'}
-                          href="#"
-                          className="block px-4 py-2 text-sm text-gray-300 data-focus:bg-white/5 data-focus:text-white data-focus:outline-hidden"
-                        >
-                          <div className="flex gap-2 justify-center items-center">
-                            <div>
-                             <img src={ele.image} style={{ height: "25px" }} alt={ele.name} />
+                <MenuItems className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-gray-800 text-white shadow-lg">
+                  <div className="py-1 max-h-64 overflow-y-auto">
+                    {/* Combine cart and forthCard arrays */}
+                    {cart.concat(forthCard).length === 0 ? (
+                      <div className="px-4 py-2 text-sm">Cart is empty</div>
+                    ) : (
+                      cart.concat(forthCard).map((ele) => (
+                        <MenuItem key={ele.id || ele.name}>
+                          <Link
+                            state={{
+                              id: ele.id,
+                              name: ele.name || ele.brand,
+                              img: ele.image || ele.images,
+                              price: ele.price || ele.price,
+                            }}
+                            to="/CartPage"
+                            className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 rounded"
+                          >
+                            <div className="flex gap-2 items-center">
+                              <img
+                                src={ele.image ||   ele.images}
+                                alt={ele.name || ele.brand}
+                                className="h-10 w-10 object-contain"
+                              />
+                              <div className="flex-1">{ele.brand}</div>
+                              <div className="text-green-500">
+                                Rs.{ele.price || 0}
+                              </div>
                             </div>
-                            <div>
-                              {ele.name}
-                            </div>
-                            <div className="text-green-500">
-                              Rs.330
-                            </div>
-                            
-                          </div>
-
-                        </Link>
-                      </MenuItem>
-                    ))}
-
-                    <form action="#" method="POST"></form>
+                          </Link>
+                        </MenuItem>
+                      ))
+                    )}
                   </div>
                 </MenuItems>
               </Menu>

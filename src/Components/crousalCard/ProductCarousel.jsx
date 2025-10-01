@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import img from '../../assets/card2.png'
 
 const items = [
   { id: 1, title: "Every Tadka Smells Like Home.", size: "4.5 LTR", price: "₹2899", image: "/ghee1.png" },
@@ -45,13 +46,13 @@ export default function ProductCarousel() {
   const nextSlide = () => setCurrent((prev) => (prev === totalSlides - 1 ? 0 : prev + 1));
 
   return (
-    <div className=" relative w-full mx-auto overflow-hidden ">
-      <h6 className="text-sm md:text-3xl font-semibold text-center mb-3 mt-3">
+    <div className=" relative w-full mx-auto overflow-hidden bg-[#fff6d9] ">
+      <h6 className="text-sm md:text-xl font-semibold text-center mb-3 mt-3">
         Trending Deals
       </h6>
       {/* Slides container */}
       <div
-        className="flex transition-transform duration-700 ease-linear gap-5"
+        className="flex transition-transform duration-700 ease-linear gap-5 mb-12"
         style={{
           transform: `translateX(-${current * 100}%)`,
           width: `${(items.length / slidesPerView) * 100}%`,
@@ -63,7 +64,8 @@ export default function ProductCarousel() {
             className="flex-shrink-0 p-3"
             style={{ width: `${100 / slidesPerView}%` }}
           >
-            <div className="rounded-lg overflow-hidden shadow bg-[url('../../../public/caur.png')] bg-cover bg-center flex flex-col justify-between p-6 h-50">
+            <div className="rounded-lg overflow-hidden shadow bg-[url()] bg-cover bg-center flex flex-col justify-between p-6 h-50" 
+            style={{ backgroundImage: `url(${img})` }}>
               {/* Text Section */}
               <div className="space-y-3">
                 <h2 className="text-base md:text-lg font-bold text-black leading-snug">

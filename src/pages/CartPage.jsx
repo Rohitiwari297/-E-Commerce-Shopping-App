@@ -1,10 +1,15 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 function CartPage() {
   // fetch data from store
   const { cart } = useSelector((state) => state.dataToCart);
   console.log("Redux cart:", cart);
+
+  const location = useLocation();
+  const {id, name, img, price} = location.state || {};
 
   // local state for cart (initialize quantity safely)
   const [cartData, setCartData] = useState(
@@ -57,7 +62,9 @@ function CartPage() {
             key={item.id}
             className="flex gap-4 p-4 border rounded-md bg-white"
           >
+          
             <img src={item.image} alt={item.name} className="w-24 h-24" />
+
             <div className="flex-1 flex flex-col justify-between">
               <div>
                 <h2 className="font-semibold">{item.name}</h2>
@@ -101,6 +108,9 @@ function CartPage() {
                 </button>
               </div>
             </div>
+            <Link to={'/category/itemDetails/'} >
+            <h5>View Product Details</h5>
+            </Link>
           </div>
         ))}
       </div>
