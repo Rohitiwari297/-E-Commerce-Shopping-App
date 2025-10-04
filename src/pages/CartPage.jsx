@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
 function CartPage() {
@@ -8,12 +8,18 @@ function CartPage() {
   const { cart } = useSelector((state) => state.dataToCart);
   console.log("Redux cart:", cart);
 
+  //create navigate instance
+  const navigate = useNavigate();
+
+  // get items from location state
   const location = useLocation();
-  const {id, name, img, price} = location.state || {};
+  const {items} = location.state || {};
+
+  console.log("Location items:", items);
 
   // local state for cart (initialize quantity safely)
   const [cartData, setCartData] = useState(
-    cart.map((item) => ({
+    items.map((item) => ({
       ...item,
       quantity: item.quantity ?? 1, // default to 1 if missing
     }))
@@ -108,7 +114,9 @@ function CartPage() {
                 </button>
               </div>
             </div>
-            <Link to={'/category/itemDetails/'} >
+            <Link to={'/category/itemDetails/'}
+              state={{ item: item }} 
+            >
             <h5>View Product Details</h5>
             </Link>
           </div>
@@ -142,7 +150,8 @@ function CartPage() {
         <p className="text-green-600 text-sm mb-4">
           You will save ₹{discount} on this order
         </p>
-        <button className="w-full bg-green-700 text-white p-3 rounded font-semibold hover:bg-green-800">
+
+        <button onClick={() => {alert("Login to place order"), handleRemove(), navigate("/login")} } className="w-full bg-green-700 text-white p-3 rounded font-semibold hover:bg-green-800">
           PLACE ORDER
         </button>
       </div>

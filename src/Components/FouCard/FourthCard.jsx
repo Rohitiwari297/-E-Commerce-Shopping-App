@@ -1,22 +1,25 @@
 import React from "react";
-import { useDispatch } from "react-redux";
-import { addToForthCard } from "../../redux/features/forthCardSlicer";
+import { useDispatch, useSelector } from "react-redux";
+import { addToForthCard, increment, decrement } from "../../redux/features/forthCardSlicer";
 import product from "../../data/data.js";
 
+function FourthCard() {
+  const dispatch = useDispatch();
+  const {allproducts} = useSelector((state) => state.forthCard); // get cart items
+
+  const getCartItem = (id) => allproducts.find((allproducts) => allproducts.id === id);
 
 
-function FourthCard({ img }) {
-  
+  // Addition and removal handlers
+  const handleAddItems = async (item) => {
+    console.log("Adding item:", item);
+    await dispatch(increment(item));
+  };
 
-  const dispatch = useDispatch()
-
-  const addHandler = (item) => {
-    console.log("item added", item)
-    dispatch(addToForthCard(item))
-
-  }
-
-
+  const handleDeleteItems = async(item) => {
+    console.log("Deleting item:", item);
+    await dispatch(decrement(item));
+  };
 
   return (
     <div className="bg-[#fff6d9] py-10 px-4 md:px-10">
@@ -27,58 +30,80 @@ function FourthCard({ img }) {
 
       {/* Product Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-6 gap-4 justify-center items-center">
-        {product.map((item) => (
-          <div
-            key={item.id}
-            className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300 flex flex-col"
-          >
-            {/* Discount Badge */}
-            <div className="relative ml-6.5">
-              <span className="absolute top-1 -ml-5 left-1 bg-green-700 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-md">
-                off {item.discountPercentage}%
-              </span>
-              <img
-                src={item.thumbnail  }
-                
-                alt={item.name}
-                className="w-[500px] h-40 shadow-1xs -ml-3 items-center  object-contain p-2"
-              />
-            </div>
+        {product.map((item) => {
+          const cartItem = getCartItem(item.id);
 
-            {/* Product Info */}
-            <div className="p-2 flex flex-col justify-between flex-grow">
-              <h3 className="text-xs font-medium mb-1 line-clamp-2">
-                {item.name}
-              </h3>
-              <p className="text-sm text-black">
-                  {item.description.replace(/<[^>]+>/g, '').slice(0, 30)}...
-                </p>
-              <div className="flex flex-row items-start mt-1 justify-between">
-                
-                <div>
-                  <p className="text-sm font-bold text-green-800">
-                  ₹ {item.price}
-                </p>
-                <p className="text-[11px] text-gray-500 line-through">
-                  ₹ {item.price + 100}
-                </p>
-                </div>
-                <div>
-                  <p className="text-sm text-black font-semibold">
-                  Stock: {item.stock}
-                </p>
-                  <p className="text-[12px] text-yellow-700 ">
-                  Rating: {item.rating}
-                </p>
-                </div>
-                
+          return (
+            <div
+              key={item.id}
+              className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300 flex flex-col"
+            >
+              {/* Discount Badge */}
+              <div className="relative ml-6.5">
+                <span className="absolute top-1 -ml-5 left-1 bg-green-700 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-md">
+                  off {item.discountPercentage}%
+                </span>
+                <img
+                  src={item.thumbnail}
+                  alt={item.name}
+                  className="w-[500px] h-40 shadow-1xs -ml-3 items-center object-contain p-2"
+                />
               </div>
-              <button onClick={() => addHandler(item)} className="mt-2 border border-green-700 text-green-700 rounded-full py-0.5 px-3 text-xs hover:bg-green-700 hover:text-white transition">
-                Add
-              </button>
+
+              {/* Product Info */}
+              <div className="p-2 flex flex-col justify-between flex-grow">
+                <h3 className="text-xs font-medium mb-1 line-clamp-2">
+                  {item.name}
+                </h3>
+                <p className="text-sm text-black">
+                  {item.description.replace(/<[^>]+>/g, "").slice(0, 30)}...
+                </p>
+                <div className="flex flex-row items-start mt-1 justify-between">
+                  <div>
+                    <p className="text-sm font-bold text-green-800">₹ {item.price}</p>
+                    <p className="text-[11px] text-gray-500 line-through">
+                      ₹ {item.price + 100}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-black font-semibold">
+                      Stock: {item.stock}
+                    </p>
+                    <p className="text-[12px] text-yellow-700 ">
+                      Rating: {item.rating}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Add / Counter Buttons */}
+                {cartItem ? (
+                  <div className="mt-2 flex items-center justify-between border border-green-700 rounded-full px-2">
+                    <button
+                      onClick={() => handleDeleteItems(item)}
+                      className="px-2 py-0.5 text-green-700 hover:bg-green-700 hover:text-white rounded-full text-sm"
+                    >
+                      -
+                    </button>
+                    <span className="px-2 text-sm">{cartItem.quantity}</span>
+                    <button
+                      onClick={() => handleAddItems(item)}
+                      className="px-2 py-0.5 text-green-700 hover:bg-green-700 hover:text-white rounded-full text-sm"
+                    >
+                      +
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => dispatch(addToForthCard(item))}
+                    className="mt-2 border border-green-700 text-green-700 rounded-full py-0.5 px-3 text-xs hover:bg-green-700 hover:text-white transition"
+                  >
+                    Add
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
