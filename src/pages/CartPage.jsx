@@ -1,40 +1,42 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import Modal from "@mui/material/Modal";
+import Box from "@mui/material/Box";
+import AddressModalPage from "./AddressModalPage "; // ✅ fixed import path
 
 function CartPage() {
   // fetch data from store
   const { cart } = useSelector((state) => state.dataToCart);
   console.log("Redux cart:", cart);
 
-  //create navigate instance
+  // modal state
+  const [openAddressModal, setOpenAddressModal] = useState(false);
+  const [confirmAddress, setConfirmAddress] = useState(true)
+
+  // navigation
   const navigate = useNavigate();
 
   // get items from location state
   const location = useLocation();
-  const {items} = location.state || {};
+  const { items } = location.state || {};
 
   console.log("Location items:", items);
 
-  // local state for cart (initialize quantity safely)
+  // local cart state
   const [cartData, setCartData] = useState(
-    items.map((item) => ({
+    items?.map((item) => ({
       ...item,
-      quantity: item.quantity ?? 1, // default to 1 if missing
-    }))
+      quantity: item.quantity ?? 1,
+    })) || []
   );
-  console.log("cartData:", cartData);
 
   // increase/decrease quantity
   const handleQuantityChange = (id, delta) => {
     setCartData((prev) =>
       prev.map((item) =>
         item.id === id
-          ? {
-              ...item,
-              quantity: Math.max(1, (item.quantity ?? 1) + delta), // prevent NaN, minimum 1
-            }
+          ? { ...item, quantity: Math.max(1, (item.quantity ?? 1) + delta) }
           : item
       )
     );
@@ -45,7 +47,7 @@ function CartPage() {
     setCartData((prev) => prev.filter((item) => item.id !== id));
   };
 
-  // calculate totals with safe fallbacks
+  // price calculations
   const totalPrice = cartData.reduce((acc, item) => {
     const price = Number(item.price ?? 330);
     const quantity = Number(item.quantity ?? 1);
@@ -61,6 +63,8 @@ function CartPage() {
 
   return (
     <div className="container mx-auto p-6 flex flex-col lg:flex-row gap-6">
+
+      
       {/* Cart Items */}
       <div className="flex-1 flex flex-col gap-4">
         {cartData.map((item) => (
@@ -68,9 +72,7 @@ function CartPage() {
             key={item.id}
             className="flex gap-4 p-4 border rounded-md bg-white"
           >
-          
             <img src={item.image} alt={item.name} className="w-24 h-24" />
-
             <div className="flex-1 flex flex-col justify-between">
               <div>
                 <h2 className="font-semibold">{item.name}</h2>
@@ -114,10 +116,8 @@ function CartPage() {
                 </button>
               </div>
             </div>
-            <Link to={'/category/itemDetails/'}
-              state={{ item: item }} 
-            >
-            <h5>View Product Details</h5>
+            <Link to={"/category/itemDetails/"} state={{ item }}>
+              <h5>View Product Details</h5>
             </Link>
           </div>
         ))}
@@ -125,6 +125,11 @@ function CartPage() {
 
       {/* Price Details */}
       <div className="w-full lg:w-1/3 p-4 border rounded-md bg-white">
+
+      <div className="p-4 -mx-4.5 border rounded-md bg-white mb-5 -mt-10">
+        <p className="text-red-600 text-[12px]">Delivery Address:</p>
+        <p>DLE Industrial Area, Moti Nagar, New Delhi</p>
+      </div>
         <h2 className="font-semibold text-lg mb-4">PRICE DETAILS</h2>
         <div className="flex justify-between mb-2">
           <span>Price ({cartData.length} items)</span>
@@ -151,10 +156,40 @@ function CartPage() {
           You will save ₹{discount} on this order
         </p>
 
-        <button onClick={() => {alert("Login to place order"), handleRemove(), navigate("/login")} } className="w-full bg-green-700 text-white p-3 rounded font-semibold hover:bg-green-800">
+        {/* Place Order Button */}
+        <button
+          onClick={() => setOpenAddressModal(true)}
+          className="w-full bg-green-700 text-white p-3 rounded font-semibold hover:bg-green-800"
+        >
           PLACE ORDER
         </button>
       </div>
+
+      {/* Address Modal */}
+      <Modal
+        open={openAddressModal}
+        onClose={() => setOpenAddressModal(false)}
+        aria-labelledby="address-modal"
+        aria-describedby="enter-address-for-order"
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "90%",
+            maxWidth: "900px",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            borderRadius: 2,
+            outline: "none",
+            overflow: "hidden",
+          }}
+        >
+          <AddressModalPage onClose={() => setOpenAddressModal(false) } />
+        </Box>
+      </Modal>
     </div>
   );
 }

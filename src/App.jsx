@@ -9,6 +9,9 @@ import Register from './pages/Register';
 import Category from './pages/Category';
 import ProductDetailing from './pages/ProductDetailing';
 import CartPage from './pages/CartPage'
+import DeliveryHistory from './pages/DeliveryHistory';
+import PaymentPage from './pages/PaymentPage';
+import OrderHistory from './pages/OderHistory';
 
 
 
@@ -25,6 +28,12 @@ function App() {
           <Route path='/category' element={<Category/>} />
           <Route path="/category/itemDetails" element={<ProductDetailing />} />
           <Route path='/cartPage' element={<CartPage/>} />
+          <Route path='deliveryHistory' element={<DeliveryHistory/>} />
+          <Route path='paymentPage' element={<PaymentPage/>} />
+          <Route path='orderHistory' element={<OrderHistory/>} />
+
+          
+
         </Routes>
       </main>
       <Footer />

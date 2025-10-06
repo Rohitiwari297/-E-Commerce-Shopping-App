@@ -116,4 +116,4 @@ function ProductDetailing() {
   );
 }
 
-export default ProductDetailing;
+export default ProductDetailing;  
