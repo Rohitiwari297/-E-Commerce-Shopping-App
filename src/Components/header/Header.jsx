@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoMdSearch } from "react-icons/io";
 import { TbCategory } from "react-icons/tb";
 import { FaRegUser } from "react-icons/fa";
@@ -6,46 +6,43 @@ import { IoCartOutline } from "react-icons/io5";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { IoIosArrowDown } from "react-icons/io";
 import img from "../../../public/hel.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import Badge from "@mui/material/Badge";
 import { useSelector, useDispatch } from "react-redux";
 import { removeFromAddition } from "../../redux/features/addition"; // adjust import path
-import { useNavigate } from "react-router-dom";
 import Location from "../../helper/Location";
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const [userSession, setUserSession] = useState(null);
 
-  //create navigate instance
   const navigate = useNavigate();
-
-  //  Always treat as arrays
-  // const cart = useSelector((state) => state.dataToCart.cart) || [];
-  const {addition} = useSelector((state) => state.additionSlice) || [];
-  const {allproducts} = useSelector((state) => state.forthCard) || [];
-  const forthCard = useSelector((state) => state.forthCard) || [];
-  
-
-  const totalItems = addition.length + allproducts.length ;  //  define properly
-
-  // console.log("Cart items:", cart);
-  console.log("All products:", allproducts);
-  console.log("Addition items:", addition);
-
-  //  Total items count
-  // const totalItems = cart.length + addition.length + items.length;
-
   const dispatch = useDispatch();
 
-  const handleRemove = (id) => {
-    dispatch(removeFromAddition(id)); // only remove from additionSlice
+  const { addition } = useSelector((state) => state.additionSlice) || [];
+  const { allproducts } = useSelector((state) => state.forthCard) || [];
+
+  const totalItems = (addition?.length || 0) + (allproducts?.length || 0);
+  const allCartItems = [...addition, ...allproducts];
+
+  // ✅ Load user session from localStorage
+  useEffect(() => {
+    const storedUser = localStorage.getItem("userSession");
+    if (storedUser) {
+      setUserSession(JSON.parse(storedUser)); // ✅ Correct: parse JSON, not stringify
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("userSession");
+    setUserSession(null);
+    navigate("/Login");
   };
 
-  // Categories Dropdown Data
   const categories = [
     "Atta, Rice & Dals",
     "Breakfast, Dips & Spreads",
@@ -64,9 +61,6 @@ function Header() {
     "Pet Care",
   ];
 
-  // Merge all 3 sources into single array
-  const allCartItems = [...addition, ...allproducts];
-
   return (
     <div className="shadow sticky top-0 z-50 bg-white">
       <div className="container mx-auto">
@@ -76,9 +70,8 @@ function Header() {
             <img className="md:w-28" src={img} alt="logo" />
           </div>
 
-          {/* select Location */}
+          {/* Location */}
           <div className="hidden md:flex flex-col text-sm cursor-pointer">
-            {/* Location Component */}
             <Location />
           </div>
 
@@ -111,30 +104,78 @@ function Header() {
               <div className="absolute top-10 left-0 w-60 bg-white shadow-lg rounded-md p-3 z-50">
                 <ul className="flex flex-col gap-2 h-60 overflow-y-auto">
                   {categories.map((cat, idx) => (
-                    <Link onClick={() => setCategoriesOpen(false)} key={idx} to="/category">
+                    <Link
+                      key={idx}
+                      to="/category"
+                      onClick={() => setCategoriesOpen(false)}
+                    >
                       <li className="p-2 hover:bg-gray-100 rounded cursor-pointer">
                         {cat}
                       </li>
-                      
                     </Link>
                   ))}
-                  
                 </ul>
               </div>
-              
             )}
-            
 
-            {/* Login */}
-            <Link
-              to="/Login"
-              className="flex items-center gap-2 cursor-pointer hover:text-[#0c721f]"
-            >
-              <FaRegUser size={18} />
-              Login
-            </Link>
+            {/* ✅ Login or Account Menu */}
+            {userSession ? (
+              <Menu as="div" className="relative inline-block">
+                <MenuButton className="flex items-center gap-2 cursor-pointer hover:text-[#0c721f]">
+                  <FaRegUser size={18} />
+                  <span>Account</span>
+                  <IoIosArrowDown size={16} />
+                </MenuButton>
 
-            {/* Cart Dropdown */}
+                <MenuItems className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md border border-gray-100">
+                  <div className="px-4 py-2 text-sm text-gray-700 border-b">
+                    {userSession.email}
+                  </div>
+                  <MenuItem>
+                    <button
+                      onClick={() => navigate("/deliveryHistory")}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                    >
+                      My Account
+                    </button>
+                  </MenuItem>
+                  <MenuItem>
+                    <button
+                      onClick={() => navigate("/deliveryHistory")}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                    >
+                      My Orders
+                    </button>
+                  </MenuItem>
+                  <MenuItem>
+                    <button
+                      onClick={() => navigate("/deliveryHistory")}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                    >
+                      Address
+                    </button>
+                  </MenuItem>
+                  <MenuItem>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100"
+                    >
+                      Logout
+                    </button>
+                  </MenuItem>
+                </MenuItems>
+              </Menu>
+            ) : (
+              <Link
+                to="/Login"
+                className="flex items-center gap-2 cursor-pointer hover:text-[#0c721f]"
+              >
+                <FaRegUser size={18} />
+                Login
+              </Link>
+            )}
+
+            {/* 🛒 Cart */}
             <div className="flex items-center gap-2 cursor-pointer hover:text-[#0c721f] relative">
               <Menu as="div" className="relative inline-block">
                 <MenuButton className="inline-flex gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-black hover:bg-gray-100">
@@ -160,41 +201,22 @@ function Header() {
                               />
                               <span>{ele.name || ele.brand}</span>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-green-500">
-                                Rs.{ele.price}
-                              </span>
-
-                              {/*  Only allow delete for additionSlice items */}
-                              {/* {addition.some((item) => item.id === ele.id) && (
-                                <button
-                                  onClick={() => handleRemove(ele.id)}
-                                  className="text-red-400 hover:text-red-600 text-xs"
-                                >
-                                  Remove
-                                </button>
-                              )} */}
-                            </div>
+                            <span className="text-green-500">Rs.{ele.price}</span>
                           </div>
-                          
                         </MenuItem>
-                        
                       ))
-                      
                     )}
                   </div>
                   {allCartItems.length > 0 && (
-                    <Link to="/cartPage" 
-                    state={{ items: allCartItems }}
-                  >
-                  <div className="p-2 border-t border-gray-700 flex justify-center">
-                  <MenuItem >
-                  <button  className="w-1/2 py-2 text-center items-center text-sm rounded-2xl font-semibold text-white bg-green-600 hover:bg-green-700">
-                    View Cart
-                  </button>   
-                  </MenuItem>
-                  </div>
-                   </Link>
+                    <Link to="/cartPage" state={{ items: allCartItems }}>
+                      <div className="p-2 border-t border-gray-700 flex justify-center">
+                        <MenuItem>
+                          <button className="w-1/2 py-2 text-center items-center text-sm rounded-2xl font-semibold text-white bg-green-600 hover:bg-green-700">
+                            View Cart
+                          </button>
+                        </MenuItem>
+                      </div>
+                    </Link>
                   )}
                 </MenuItems>
               </Menu>
@@ -210,7 +232,6 @@ function Header() {
         </header>
       </div>
     </div>
-    
   );
 }
 

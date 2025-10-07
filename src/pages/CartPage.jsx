@@ -4,6 +4,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import AddressModalPage from "./AddressModalPage "; // ✅ fixed import path
+import { MdLocationOn } from "react-icons/md";
 
 function CartPage() {
   // fetch data from store
@@ -127,8 +128,20 @@ function CartPage() {
       <div className="w-full lg:w-1/3 p-4 border rounded-md bg-white">
 
       <div className="p-4 -mx-4.5 border rounded-md bg-white mb-5 -mt-10">
-        <p className="text-red-600 text-[12px]">Delivery Address:</p>
-        <p>DLE Industrial Area, Moti Nagar, New Delhi</p>
+        
+        <div>
+          <div className="flex items-center justify-between">
+          <p className="text-red-600 font-semibold text-[14px]">Delivery Address:</p>
+          <div className="flex items-center">
+            <button onClick={() => setOpenAddressModal(true)} className="w-auto bg-red-700 text-white p-1 pr-4 text-[10px] rounded font-semibold hover:bg-green-800" >Location </button>
+            <MdLocationOn className="-ml-4 text-white" />
+          </div>
+          
+        </div>
+          <p>DLE Industrial Area, Moti Nagar, New Delhi</p>
+        </div>
+
+        
       </div>
         <h2 className="font-semibold text-lg mb-4">PRICE DETAILS</h2>
         <div className="flex justify-between mb-2">
@@ -158,7 +171,7 @@ function CartPage() {
 
         {/* Place Order Button */}
         <button
-          onClick={() => setOpenAddressModal(true)}
+          onClick={()=> {alert('Insure your logged In'), navigate('/paymentPage')}}
           className="w-full bg-green-700 text-white p-3 rounded font-semibold hover:bg-green-800"
         >
           PLACE ORDER

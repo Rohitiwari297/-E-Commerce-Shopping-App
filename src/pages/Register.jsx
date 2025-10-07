@@ -5,6 +5,7 @@ function Register() {
   const [form, setForm] = useState({
     name: "",
     email: "",
+    number: "",
     password: "",
     confirmPassword: "",
   });
@@ -12,6 +13,7 @@ function Register() {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
+    console.log('event',e)
     setForm({
       ...form,
       [e.target.name]: e.target.value,
@@ -70,6 +72,21 @@ function Register() {
               className="w-full mt-1 px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="you@example.com"
               value={form.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          {/* Mobile Number */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-600">
+              Mobile Number
+            </label>
+            <input
+              type="text"
+              name="number"
+              className="w-full mt-1 px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              placeholder="1234567890"
+              value={form.number}
               onChange={handleChange}
               required
             />
