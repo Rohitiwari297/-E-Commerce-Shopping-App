@@ -66,7 +66,7 @@ const handleInvoice = (order) => {
   doc.setDrawColor(0);
   doc.line(15, 35, 195, 35);
 
-  // 🧍 Customer Info Section
+  // Customer Info Section
   doc.setFont("helvetica", "bold");
   doc.setFontSize(13);
   doc.text("Billed To:", 15, 45);
@@ -79,6 +79,7 @@ const handleInvoice = (order) => {
   //  Order Info Section
   doc.setFont("helvetica", "bold");
   doc.text("Order Details:", 120, 45);
+  doc.
   doc.setFont("helvetica", "normal");
   doc.setFontSize(11);
   doc.text(`Order ID: ${order.id}`, 120, 52);

@@ -14,6 +14,7 @@ import Badge from "@mui/material/Badge";
 import { useSelector, useDispatch } from "react-redux";
 import { removeFromAddition } from "../../redux/features/addition"; // adjust import path
 import Location from "../../helper/Location";
+import store from "../../redux/app/store";
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -29,16 +30,26 @@ function Header() {
   const totalItems = (addition?.length || 0) + (allproducts?.length || 0);
   const allCartItems = [...addition, ...allproducts];
 
-  // ✅ Load user session from localStorage
+  // fetched the user session from store
+  const user = useSelector((state) => state.auth.user);
+  console.log('hello from state',user);
+
+  const token = localStorage.getItem("token");
+  
+
+  // Load user session from localStorage 
   useEffect(() => {
-    const storedUser = localStorage.getItem("userSession");
+    const storedUser = localStorage.getItem("token");
     if (storedUser) {
-      setUserSession(JSON.parse(storedUser)); // ✅ Correct: parse JSON, not stringify
+      setUserSession(storedUser); //  Correct: parse JSON, not stringify
     }
-  }, []);
+  }, [token]);
+  
+
+
 
   const handleLogout = () => {
-    localStorage.removeItem("userSession");
+    localStorage.removeItem("token");
     setUserSession(null);
     navigate("/Login");
   };
@@ -118,8 +129,8 @@ function Header() {
               </div>
             )}
 
-            {/* ✅ Login or Account Menu */}
-            {userSession ? (
+            {/* Login or Account Menu */}
+            {userSession != null ? (
               <Menu as="div" className="relative inline-block">
                 <MenuButton className="flex items-center gap-2 cursor-pointer hover:text-[#0c721f]">
                   <FaRegUser size={18} />

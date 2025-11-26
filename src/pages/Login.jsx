@@ -1,103 +1,92 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { sendOtp, login } from "../redux/features/auth/authSlice";
+import { fetchUserDetails } from "../redux/features/user/userSlice";
 
 function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [mobile, setMobile] = useState("");
+  const [otp, setOtp] = useState("");
+  const [step, setStep] = useState(1);
+
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  // STEP 1 → SEND OTP
+  const handleSendOtp = (e) => {
     e.preventDefault();
 
-    const userData = { email, password };
-
-    // Store user data in localStorage
-    localStorage.setItem("userSession", JSON.stringify(userData));
-
-    console.log("User Details:", userData);
-
-    // Redirect to your dashboard or main page
-    alert(`login Successfully Done`)
-    navigate(-1);
+    dispatch(sendOtp(mobile))
+      .unwrap()
+      .then((res) => {
+        console.log(res);
+        alert("OTP sent successfully!");
+        setStep(2);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
-
   
+
+  // STEP 2 → VERIFY OTP
+  const handleVerifyOtp = (e) => {
+    e.preventDefault();
+
+    dispatch(login({ mobile, otp }))
+      .unwrap()
+      .then((res) => {
+        alert("OTP verified successfully!");
+        navigate("/");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+ 
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white shadow-lg rounded-2xl w-full max-w-md p-8">
         <h2 className="text-2xl font-bold text-center text-gray-800">
-          Login to Your Account 
+          Login with OTP
         </h2>
-        <p className="text-sm text-gray-500 text-center mt-2">
-          Welcome back! Please enter your details.
-        </p>
 
-        <form onSubmit={handleSubmit} className="mt-6">
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-600">
-              Email Address
-            </label>
+        {step === 1 && (
+          <form onSubmit={handleSendOtp} className="mt-6">
             <input
-              type="email"
-              className="w-full mt-1 px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="number"
+              value={mobile}
+              onChange={(e) => setMobile(e.target.value)}
+              placeholder="Enter mobile number"
+              className="w-full px-4 py-2 border rounded"
               required
             />
-          </div>
+            <button className="w-full mt-4 bg-green-600 text-white py-2 rounded">
+              Send OTP
+            </button>
+          </form>
+        )}
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-600">
-              Password
-            </label>
+        {step === 2 && (
+          <form onSubmit={handleVerifyOtp} className="mt-6">
             <input
-              type="password"
-              className="w-full mt-1 px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              type="number"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              placeholder="Enter OTP"
+              className="w-full px-4 py-2 border rounded"
               required
             />
-          </div>
-
-          <div className="flex items-center justify-between mb-4 text-sm">
-            <label className="flex items-center">
-              <input type="checkbox" className="mr-2" />
-              Remember me
-            </label>
-            <Link to="/forgot-password" className="text-green-600 hover:underline">
-              Forgot Password?
-            </Link>
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-green-600 text-white py-2 rounded-lg font-medium hover:bg-green-700 transition"
-          >
-            Login
-          </button>
-        </form>
-
-        <div className="mt-6 flex items-center">
-          <hr className="flex-grow border-gray-300" />
-          <span className="px-3 text-sm text-gray-400">OR</span>
-          <hr className="flex-grow border-gray-300" />
-        </div>
-
-        <button className="w-full mt-4 flex items-center justify-center border border-gray-300 py-2 rounded-lg text-sm hover:bg-gray-100 transition">
-          <img
-            src="https://www.svgrepo.com/show/355037/google.svg"
-            alt="Google"
-            className="w-5 h-5 mr-2"
-          />
-          Continue with Google
-        </button>
+            <button className="w-full mt-4 bg-green-600 text-white py-2 rounded">
+              Verify OTP
+            </button>
+          </form>
+        )}
 
         <p className="text-center text-sm text-gray-600 mt-6">
           Don’t have an account?{" "}
-          <Link to="/register" className="text-green-600 hover:underline">
+          <Link to="/register" className="text-green-600">
             Register
           </Link>
         </p>

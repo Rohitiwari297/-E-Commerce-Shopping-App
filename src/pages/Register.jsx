@@ -92,38 +92,6 @@ function Register() {
             />
           </div>
 
-          {/* Password */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-600">
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              className="w-full mt-1 px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-              placeholder="••••••••"
-              value={form.password}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          {/* Confirm Password */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-600">
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              name="confirmPassword"
-              className="w-full mt-1 px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-              placeholder="••••••••"
-              value={form.confirmPassword}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
           {/* Submit Button */}
           <button
             type="submit"
