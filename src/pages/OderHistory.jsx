@@ -96,7 +96,7 @@ const OderHistory = () => {
       // --------------------------- */}
       
       {/* Sidebar */}
-            <aside className="w-64 bg-white border-r shadow-sm p-6">
+            {/* <aside className="w-64 bg-white border-r shadow-sm p-6">
               <div className="text-center border-b mb-8">
                 <p className="text-sm text-gray-600 font-medium" >Rohit Tripathi</p>
                 <p className="text-sm text-gray-600 font-medium">+919560613581</p>
@@ -116,13 +116,15 @@ const OderHistory = () => {
                   <LogOut size={18} /> Logout
                 </button>
               </nav>
-            </aside>
+            </aside> */}
 
       {/* ---------------------------
       // 2. Main Content (Order Details)
       // --------------------------- */}
+      
       <main className="flex-1 max-w-full  mx-auto px-4 py-6 bg-white">
-        
+
+        <div className=" mx-50">
         {/* Header and Back Button */}
         <div className="flex items-center mb-6 border-b pb-4">
           <button onClick={handleGoBack} className="text-gray-600 hover:text-green-700 mr-4">
@@ -207,6 +209,9 @@ const OderHistory = () => {
             About any issues related to your order
           </p>
         </div>
+
+        </div>
+        
 
       </main>
     </div>

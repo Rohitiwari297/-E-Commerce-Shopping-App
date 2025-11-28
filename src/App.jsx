@@ -12,6 +12,7 @@ import CartPage from './pages/CartPage'
 import DeliveryHistory from './pages/DeliveryHistory';
 import PaymentPage from './pages/PaymentPage';
 import OrderHistory from './pages/OderHistory';
+import AddressModalPage from './pages/AddressModalPage ';
 
 
 
@@ -28,9 +29,10 @@ function App() {
           <Route path='/category' element={<Category/>} />
           <Route path="/category/itemDetails" element={<ProductDetailing />} />
           <Route path='/cartPage' element={<CartPage/>} />
-          <Route path='deliveryHistory' element={<DeliveryHistory/>} />
-          <Route path='paymentPage' element={<PaymentPage/>} />
-          <Route path='orderHistory' element={<OrderHistory/>} />
+          <Route path='/delivery/history' element={<DeliveryHistory/>} />
+          <Route path='/paymentPage' element={<PaymentPage/>} />
+          <Route path='/orderHistory' element={<OrderHistory/>} />
+          <Route path="/delivery/address" element={<AddressModalPage />} />
 
           
 

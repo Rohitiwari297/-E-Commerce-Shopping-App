@@ -2,9 +2,9 @@ import React from "react";
 
 const AddressModalPage = ({ onClose }) => {
   return (
-    <div className="w-full max-h-[90vh] flex flex-col lg:flex-row rounded-lg overflow-hidden bg-white">
+    <div className="w-full max-h-[90vh] flex flex-col lg:flex-row rounded-lg overflow-hidden border border-gray-200  bg-white">
       {/* Left side (Map + Location Info) */}
-      <div className="w-full lg:w-1/2 relative">
+      <div className="w-full lg:w-1/2 relative mt-6 ml-6 border border-gray-200 mb-5">
         <iframe
           title="Address Map"
           width="100%"
@@ -24,18 +24,18 @@ const AddressModalPage = ({ onClose }) => {
       </div>
 
       {/* Right side (Form) */}
-      <div className="w-full lg:w-1/2 p-6 overflow-y-auto">
+      <div className="w-full lg:w-1/2 p-6 overflow-y-auto ">
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-bold text-blue-700">
+          <h2 className="text-lg font-bold text-black text-center border w-full border-gray-700 rounded-md px-4 py-1">
             Enter complete address
           </h2>
-          <button
-            onClick={onClose}
+          {/* <button
+            // onClick={onClose}
             className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
           >
             ×
-          </button>
+          </button> */}
         </div>
 
         {/* Save address as */}
@@ -53,37 +53,37 @@ const AddressModalPage = ({ onClose }) => {
         </div>
 
         {/* Address form inputs */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-1">
           <input
             type="text"
             placeholder="Flat / House no / Building name *"
-            className="border rounded-md p-2"
+            className="border rounded-md p-1"
           />
           <input
             type="text"
             placeholder="Floor (optional)"
-            className="border rounded-md p-2"
+            className="border rounded-md p-1"
           />
           <input
             type="text"
             placeholder="Area / Sector / Locality *"
-            className="border rounded-md p-2"
+            className="border rounded-md p-1"
             defaultValue="DLE Industrial Area, Moti Nagar, New Delhi"
           />
           <input
             type="text"
             placeholder="Nearby landmark (optional)"
-            className="border rounded-md p-2"
+            className="border rounded-md p-1"
           />
           <input
             type="text"
             placeholder="Your name *"
-            className="border rounded-md p-2"
+            className="border rounded-md p-1"
           />
           <input
             type="tel"
             placeholder="Your phone number *"
-            className="border rounded-md p-2"
+            className="border rounded-md p-1"
             defaultValue="0000000000"
           />
         </div>
