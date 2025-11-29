@@ -29,6 +29,7 @@ import { useSelector } from "react-redux";
 import DeliveryPage from "./DeliveryPage";
 import AddressModalPage from "./AddressModalPage ";
 import { GiRamProfile } from "react-icons/gi";
+import Profile from "./Profile";
 
 
 const initialDeliveries = [
@@ -178,7 +179,7 @@ function DeliveryHistory() {
           <button onClick={() => setMenu("orders")} className="flex items-center gap-3 w-full text-left hover:text-green-700">
             <ShoppingBag size={18} /> My Orders
           </button>
-          <button onClick={() => setMenu("orders")} className="flex items-center gap-3 w-full text-left hover:text-green-700">
+          <button onClick={() => setMenu("profile")} className="flex items-center gap-3 w-full text-left hover:text-green-700">
             <User size={18} /> Profile
           </button>
           <button onClick={() => setMenu("settings")} className="flex items-center gap-3 w-full text-left hover:text-green-700">
@@ -211,6 +212,12 @@ function DeliveryHistory() {
           <div>
             <h2 className="text-xl font-semibold mb-4">Settings</h2>
             <p>Settings content here...</p>
+          </div>
+        )}
+        {menu === "profile" && (
+          <div>
+            
+              <Profile />
           </div>
         )}
         </main>

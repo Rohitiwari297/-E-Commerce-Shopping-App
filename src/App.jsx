@@ -13,6 +13,7 @@ import DeliveryHistory from './pages/DeliveryHistory';
 import PaymentPage from './pages/PaymentPage';
 import OrderHistory from './pages/OderHistory';
 import AddressModalPage from './pages/AddressModalPage ';
+import Profile from './pages/Profile';
 
 
 
@@ -33,6 +34,8 @@ function App() {
           <Route path='/paymentPage' element={<PaymentPage/>} />
           <Route path='/orderHistory' element={<OrderHistory/>} />
           <Route path="/delivery/address" element={<AddressModalPage />} />
+          <Route path="/delivery/profile" element={<Profile />} />
+
 
           
 

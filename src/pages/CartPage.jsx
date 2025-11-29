@@ -18,6 +18,10 @@ function CartPage() {
   // navigation
   const navigate = useNavigate();
 
+  // get user details from store
+  const { user } = useSelector((state) => state.auth);
+  console.log("Redux user:", user);
+
   // get items from location state
   const location = useLocation();
   const { items } = location.state || {};
@@ -41,6 +45,17 @@ function CartPage() {
           : item
       )
     );
+  };
+
+  //handlePlaceOrder
+  const handlePlaceOrder = () => {
+    if (user) {
+      navigate('/paymentPage')
+      setOpenAddressModal(true);
+      alert("Complete Payment to place order");
+    } else {
+      navigate("/login");
+    }
   };
 
   // remove item
@@ -171,8 +186,8 @@ function CartPage() {
 
         {/* Place Order Button */}
         <button
-          onClick={()=> {alert('Insure your logged In'), navigate('/paymentPage')}}
-          className="w-full bg-green-700 text-white p-3 rounded font-semibold hover:bg-green-800"
+          onClick={()=> handlePlaceOrder()}
+          className="w-full bg-green-700 cursor-pointer text-white p-3 rounded font-semibold hover:bg-green-800"
         >
           PLACE ORDER
         </button>
