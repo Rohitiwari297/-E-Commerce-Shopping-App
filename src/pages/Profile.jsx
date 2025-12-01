@@ -1,9 +1,40 @@
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { Target } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { updateProfileDetails } from "../redux/features/user/userAPI";
+import { getUserDetails } from "../redux/features/user/userSlice";
 
 function Profile() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user } = useSelector((state) => state.auth);
+
+  // // get user details from store
+  const { user: userData, loading, error } = useSelector((state) => state.user);
+  console.log("user data1", userData);
+
+
+  // state for update profile
+  const [updateProfile, setUpdateProfile] = useState({
+    id: user._id,
+    avatar: "",
+    location: "",
+    name: "",
+  });
+
+  // console.log("updateProfile", updateProfile);
+
+  // handle save button
+  const handleSaveButton = () => {
+  setIsMenuOpen(false);
+  updateProfileDetails({
+    id: user._id,
+    updateProfile,
+    //setUser,      // pass this
+  });
+};
+
+
+ 
 
   return (
     <div className="   -mt-10  ">
@@ -25,17 +56,17 @@ function Profile() {
         <div className="space-y-4">
           <div className="flex justify-between border-b pb-2">
             <h2 className="text-gray-600 font-medium">Customer Name:</h2>
-            <p className="text-gray-800 font-semibold">{user?.name || "Pinchuk"}</p>
+            <p className="text-gray-800 font-semibold">{userData?.name || "Pinchuk"}</p>
           </div>
 
           <div className="flex justify-between border-b pb-2">
             <h2 className="text-gray-600 font-medium">Customer Number:</h2>
-            <p className="text-gray-800 font-semibold">{user?.mobile}</p>
+            <p className="text-gray-800 font-semibold">{userData?.mobile}</p>
           </div>
 
           <div className="flex justify-between border-b pb-2">
             <h2 className="text-gray-600 font-medium">Customer Email:</h2>
-            <p className="text-gray-800 font-semibold">{user?.email || "pinchuk@gmail.com"}</p>
+            <p className="text-gray-800 font-semibold">{userData?.email || "pinchuk@gmail.com"}</p>
           </div>
 
           {/* Address */}
@@ -46,7 +77,7 @@ function Profile() {
               <div>
                 <h3 className="font-medium text-gray-700">Current Address:</h3>
                 <p className="text-gray-800">
-                  {user?.currentAddress || "DLE Industrial Area, Moti Nagar, New Delhi"}
+                  {userData?.location || "DLE Industrial Area, Moti Nagar, New Delhi"}
                 </p>
               </div>
 
@@ -83,15 +114,26 @@ function Profile() {
                 &times;
               </button>
             </div>
-
+            
             {/* Form Fields */}
-            <div className="space-y-4">
+            <div className="space-y-4 overflow-y-auto">
+              <div>
+                <label className = "block text-sm text-gray-600 mb-1 "> Profile Picture</label>
+                <input 
+                  type="file" 
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  defaultValue={user?.profilePic}
+                  onChange={(e) => setUpdateProfile({...updateProfile, avatar: e.target.value})}
+
+                />
+              </div>
               <div>
                 <label className="block text-sm text-gray-600 mb-1">Customer Name</label>
                 <input
                   type="text"
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   defaultValue={user?.name}
+                  onChange={(e) => setUpdateProfile({...updateProfile, name: e.target.value})}
                 />
               </div>
 
@@ -101,24 +143,27 @@ function Profile() {
                   type="text"
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   defaultValue={user?.mobile}
+                  onChange={(e) => setUpdateProfile({...updateProfile, customerNumber: e.target.value})}
                 />
               </div>
 
-              <div>
+              {/* <div>
                 <label className="block text-sm text-gray-600 mb-1">Customer Email</label>
                 <input
                   type="email"
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   defaultValue={user?.email}
+                  //onChange={(e) => setUpdateProfile({...updateProfile, customerEmail: e.target.value})}
                 />
-              </div>
+              </div> */}
 
               <div>
                 <label className="block text-sm text-gray-600 mb-1">Address</label>
                 <textarea
                   className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   rows="2"
-                  defaultValue={user?.address}
+                  defaultValue={user?.location}
+                  onChange={(e) => setUpdateProfile({...updateProfile, location: e.target.value})}
                 ></textarea>
               </div>
             </div>
@@ -134,9 +179,7 @@ function Profile() {
 
               <button
                 className="px-4 py-2 rounded-lg bg-green-700 hover:bg-green-600 text-white"
-                onClick={() =>
-                  setIsMenuOpen(false) || alert("Add backend functionality here!")
-                }
+                onClick={() => handleSaveButton()}
               >
                 Save
               </button>

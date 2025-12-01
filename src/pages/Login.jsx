@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { sendOtp, login } from "../redux/features/auth/authSlice";
-import { fetchUserDetails } from "../redux/features/user/userSlice";
 
 function Login() {
   const [mobile, setMobile] = useState("");

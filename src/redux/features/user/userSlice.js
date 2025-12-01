@@ -1,15 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getUserDetails } from "./userAPI";
+import axiosInstance from "../../../api/axiosInstance";
 
-// Thunk → fetch user details
-export const fetchUserDetails = createAsyncThunk(
-  "user/fetchUserDetails",
+
+export const getUserDetails = createAsyncThunk(
+  "user/getUserDetails",
   async (id, thunkAPI) => {
     try {
-      const res = await getUserDetails(id);
-      return res.data; // API response format → { data: {...} }
-    } catch (err) {
-      return thunkAPI.rejectWithValue(err.response?.data || "Error fetching user");
+      const response = await axiosInstance.get(`/api/users/${id}`);
+      return response.data.data;  // backend se jo data aa raha hai
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
@@ -21,30 +21,27 @@ const userSlice = createSlice({
     loading: false,
     error: null,
   },
-
   reducers: {
-    clearUser(state) {
-      state.user = null;
-      state.error = null;
+    setUser: (state, action) => {
+      state.user = action.payload;
     },
   },
-
   extraReducers: (builder) => {
     builder
-      .addCase(fetchUserDetails.pending, (state) => {
+      .addCase(getUserDetails.pending, (state) => {
         state.loading = true;
-        state.error = null;
       })
-      .addCase(fetchUserDetails.fulfilled, (state, action) => {
+      .addCase(getUserDetails.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload; // actual user
+        state.user = action.payload;   // ← data store me save ho gaya
       })
-      .addCase(fetchUserDetails.rejected, (state, action) => {
+      .addCase(getUserDetails.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
   },
 });
 
-export const { clearUser } = userSlice.actions;
+export const { setUser } = userSlice.actions;
+
 export default userSlice.reducer;

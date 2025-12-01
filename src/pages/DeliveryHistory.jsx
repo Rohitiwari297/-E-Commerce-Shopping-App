@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import img1 from "../assets/makha.png";
 import img2 from "../assets/chal.png";
@@ -25,11 +25,12 @@ import {
   Settings,
   User,
 } from "lucide-react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import DeliveryPage from "./DeliveryPage";
 import AddressModalPage from "./AddressModalPage ";
 import { GiRamProfile } from "react-icons/gi";
 import Profile from "./Profile";
+import { getUserDetails } from "../redux/features/user/userSlice";
 
 
 const initialDeliveries = [
@@ -139,9 +140,6 @@ function DeliveryHistory() {
   const [deliveries, setDeliveries] = useState(initialDeliveries);
   const navigate = useNavigate();
 
-  // state for menu toggle
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
   // state for selected menu 
   const [menu, setMenu] = useState("orders");
 
@@ -164,20 +162,33 @@ function DeliveryHistory() {
     }
   };
 
+
+  // get user details from store
+    const dispatch = useDispatch();
+  
+    const { user: userData, loading, error } = useSelector((state) => state.user);
+  
+    useEffect(() => {
+      dispatch(getUserDetails(user._id));
+    }, [user._id]);
+  
+    console.log("user data", userData);
+
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r shadow-sm p-6">
         <div className="text-center border-b mb-8">
-          <p className="text-sm text-gray-600 font-medium" >{user.name || "Rohit Tripathi"}</p>
-          <p className="text-sm text-gray-600 font-medium">+91-{user.mobile}</p>
+          <p className="text-sm text-gray-600 font-medium" >{userData?.name || "Rohit Tripathi"}</p>
+          <p className="text-sm text-gray-600 font-medium">+91-{userData?.mobile}</p>
         </div>
         <nav className="space-y-4 text-gray-700">
-          <button onClick={() => setMenu("address")} className="flex items-center gap-3 w-full text-left hover:text-green-700">
-            <MapPin size={18} /> Addresses
-          </button>
+          
           <button onClick={() => setMenu("orders")} className="flex items-center gap-3 w-full text-left hover:text-green-700">
             <ShoppingBag size={18} /> My Orders
+          </button>
+          <button onClick={() => setMenu("address")} className="flex items-center gap-3 w-full text-left hover:text-green-700">
+            <MapPin size={18} /> Addresses
           </button>
           <button onClick={() => setMenu("profile")} className="flex items-center gap-3 w-full text-left hover:text-green-700">
             <User size={18} /> Profile
