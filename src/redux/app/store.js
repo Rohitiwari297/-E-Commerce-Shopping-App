@@ -6,12 +6,14 @@ import forthCardSlicce from '../features/forthCardSlicer'
 import AdditionSlice from '../features/addition'
 import authReducer from "../features/auth/authSlice";
 import userReducer from "../features/user/userSlice";
+import catReducer from "../features/category/categotySlice"
 
 
 const store = configureStore({
     reducer:{
         auth: authReducer,
         user: userReducer,
+        cateData: catReducer,
         allCards: CartSlice,
         dataToCart: CartSlicer  ,
         products: productsReducer,

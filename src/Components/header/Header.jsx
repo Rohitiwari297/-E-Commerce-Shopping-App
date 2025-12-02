@@ -14,6 +14,7 @@ import Badge from "@mui/material/Badge";
 import { useSelector, useDispatch } from "react-redux";
 import Location from "../../helper/Location";
 import { getCategories } from "../../utils/Apis";
+import { getCat } from "../../redux/features/category/categotySlice";
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -34,14 +35,14 @@ function Header() {
 
   const token = localStorage.getItem("token");
 
-  // ⭐ NEW: Ref for outside click
+  // NEW: Ref for outside click
   const categoriesRef = useRef(null);
 
   useEffect(() => {
     if (token) setUserSession(token);
   }, [token]);
 
-  // ⭐ NEW: Close categories on outside click
+  // NEW: Close categories on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -67,9 +68,25 @@ function Header() {
   //
   useEffect(() => {
     getCategories({setCategoryDetails});
-  },[]) 
+  },[user]); 
+
+
+  /**  
+   * SET CATEGORIES LIST IN GLOBAL STATE 
+   * 
+  */
+    useEffect(() => {
+      //console.log("categoryDetails UPDATED:", categoryDetails);
+      if (categoryDetails) {
+        dispatch(getCat(categoryDetails));
+      }
+    }, [categoryDetails]);
+
+
+    //get the category data from global state
+    const categoryData = useSelector((state) => state);
     
-   console.log('categoryDetails',categoryDetails);
+   //console.log('categoryDetailsrrrrr',categoryData);
 
   return (
     <div className="shadow sticky top-0 z-50 bg-white">

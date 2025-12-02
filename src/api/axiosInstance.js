@@ -1,4 +1,5 @@
 import axios from "axios";
+export const BaseURI = "`https://multigrocery.quickreachindia.com/";
 
 const axiosInstance = axios.create({
   baseURL: "https://multigrocery.quickreachindia.com/",

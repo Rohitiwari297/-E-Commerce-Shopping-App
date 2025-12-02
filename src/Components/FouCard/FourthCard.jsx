@@ -6,8 +6,10 @@ import product from "../../data/data.js";
 function FourthCard() {
   const dispatch = useDispatch();
   const {allproducts} = useSelector((state) => state.forthCard); // get cart items
+  
 
-  const getCartItem = (id) => allproducts.find((allproducts) => allproducts.id === id);
+   const getCartItem = (id) => allproducts.find((allproducts) => allproducts.id === id);
+   console.log("allproducts", getCartItem);
 
 
   // Addition and removal handlers

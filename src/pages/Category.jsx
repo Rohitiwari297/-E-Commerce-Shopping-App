@@ -8,16 +8,6 @@ import makha from "../assets/makha.png";
 import namk from "../assets/namk.png";
 import chal from "../assets/chal.png";
 
-// Categories for sidebar
-const categoriesData = [
-  { id: 1, name: "Atta, Rice & Dals", image: namk },
-  { id: 2, name: "Breakfast, Dips & Spreads", image: chal },
-  { id: 3, name: "Masalas, Oils & Dry Fruits", image: makha },
-  { id: 4, name: "Chips, Biscuits & Namkeens", image: namk },
-  { id: 5, name: "Hot & Cold Beverages", image: chal },
-  { id: 6, name: "Instant & Frozen Foods", image: makha },
-];
-
 // Product grid example
 const productGridCategories = [
   {
@@ -191,19 +181,28 @@ function Category() {
   const cartData = useSelector((state) => state.additionSlice.addition); // cart items
   const [apiData, setApiData] = useState([]);
 
-  // Fetch products from Redux store
-  const data = useSelector((state) => state.products);
-  const respons = data.items;
-  
-  useEffect(() => {
-    if (respons && respons.length > 0) {
-      setApiData(respons);
-    }
-  }, [respons]);
+   /**
+   * GET ALL CATEGORIES DATA FROM THE GLOBAL STATE
+   * FOR THE SIDEBAR / FILTER
+   */
+    const {catData} = useSelector((state) => state.cateData);
 
-  useEffect(() => {
-    dispatch(fetchProducts());
-  }, [dispatch]);
+
+
+  // // Fetch products from Redux store
+  // const data = useSelector((state) => state.products);
+  // const respons = data.items;
+  // console.log('respons',respons);
+  
+  // useEffect(() => {
+  //   if (respons && respons.length > 0) {
+  //     setApiData(respons);
+  //   }
+  // }, [respons]);
+
+  // useEffect(() => {
+  //   dispatch(fetchProducts());
+  // }, [dispatch]);
 
   // Add item to cart
   const handleAdd = (item) => {
@@ -221,6 +220,8 @@ function Category() {
     return cartData.filter((item) => item.id === id).length;
   };
 
+ 
+
   return (
     <div className="flex flex-col md:flex-row min-h-screen">
       {/* Sidebar */}
@@ -231,9 +232,9 @@ function Category() {
           </h3>
         </div>
         <ul className="flex flex-row md:flex-col p-2 md:p-0 space-x-2 md:space-x-0 md:space-y-2 overflow-x-auto md:overflow-x-hidden ml-9 md:h-[calc(100vh-40px)] md:overflow-y-auto">
-          {categoriesData.map((cat) => (
-            <li key={cat.id} className="min-w-[100px] max-w-[100px] md:w-full border rounded-lg shadow hover:scale-105 transition p-2 flex flex-col items-center cursor-pointer md:m-2">
-              <img src={cat.image} alt={cat.name} className="w-12 h-12 object-contain mb-1" />
+          {catData.map((cat) => (
+            <li key={cat._id} className="min-w-[100px] max-w-[100px] md:w-full border rounded-lg shadow hover:scale-105 transition p-2 flex flex-col items-center cursor-pointer md:m-2">
+              <img src={`${import.meta.env.VITE_BASE_URL}${cat.image}`} alt={cat.name} className="w-12 h-12 object-contain mb-1" />
               <p className="text-[10px] text-black font-medium text-center">{cat.name}</p>
             </li>
           ))}
