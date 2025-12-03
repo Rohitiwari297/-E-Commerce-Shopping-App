@@ -7,6 +7,7 @@ import AdditionSlice from '../features/addition'
 import authReducer from "../features/auth/authSlice";
 import userReducer from "../features/user/userSlice";
 import catReducer from "../features/category/categotySlice"
+import prodReducer from "../features/product/productSlice"
 
 
 const store = configureStore({
@@ -14,6 +15,7 @@ const store = configureStore({
         auth: authReducer,
         user: userReducer,
         cateData: catReducer,
+        prodData: prodReducer,
         allCards: CartSlice,
         dataToCart: CartSlicer  ,
         products: productsReducer,

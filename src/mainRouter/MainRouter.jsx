@@ -15,9 +15,9 @@ function MainRouter() {
       <ProductCarousel img="/caur.png" />
 
       {/* category */}
-      <Link to="/category">
+      {/* <Link to="/category"> */}
         <SecCard />
-      </Link>
+      {/* </Link> */}
 
       <FourthCard />
       <FifCard img={chalImg} />
