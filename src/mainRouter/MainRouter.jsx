@@ -10,22 +10,35 @@ import { Link } from "react-router-dom";
 
 function MainRouter() {
   return (
-    <>
-      <SeCarousel />
-      <ProductCarousel img="/caur.png" />
+    <div className="bg-[#fff6d9] w-full min-h-screen overflow-x-hidden">
 
-      {/* category */}
-      {/* <Link to="/category"> */}
+      {/* Carousel Section */}
+      <div className="w-full">
+        <SeCarousel />
+      </div>
+
+      {/* Product Carousel */}
+      <div className="w-full px-2 sm:px-4">
+        <ProductCarousel img="/caur.png" />
+      </div>
+
+      {/* Category Cards */}
+      <div className="w-full px-2 sm:px-4">
         <SecCard />
-      {/* </Link> */}
+      </div>
 
-      <FourthCard />
-      <FifCard img={chalImg} />
-      <FourthCard />
-      <SixCars />
-      <FifCard img={chalImg} />
-    </>
+      {/* Cards Section */}
+      <div className="w-full px-2 sm:px-4 space-y-6">
+        <FourthCard />
+        <FifCard img={chalImg} />
+        <FourthCard />
+        <SixCars />
+        <FifCard img={chalImg} />
+      </div>
+
+    </div>
   );
 }
+
 
 export default MainRouter;

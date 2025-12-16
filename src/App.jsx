@@ -14,10 +14,24 @@ import PaymentPage from './pages/PaymentPage';
 import OrderHistory from './pages/OderHistory';
 import AddressModalPage from './pages/AddressModalPage ';
 import Profile from './pages/Profile';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { fetchCartAPI } from './redux/features/cart/cartSlice';
 
 
 
 function App() {
+
+
+/**
+ * FETCHING CAT API DATA AND SAVING IT IN THE REDUX STORE 
+ */
+  const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (!user) return;
+    dispatch(fetchCartAPI());
+  }, [user]);
 
   return (
     <div className="min-h-screen flex flex-col">  

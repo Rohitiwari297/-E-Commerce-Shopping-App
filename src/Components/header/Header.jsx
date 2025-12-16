@@ -28,6 +28,11 @@ function Header() {
   const { allproducts } = useSelector((state) => state.forthCard) || [];
   const user = useSelector((state) => state.auth.user);
 
+  // COUNT OF THE CART ITEM
+  const cart = useSelector((state) => state.addToCartData);
+  const { items } = cart;
+  console.log("rrrrrrrrrr", items[0]?.productId.name);
+
   const totalItems = (addition?.length || 0) + (allproducts?.length || 0);
   const allCartItems = [...addition, ...allproducts];
 
@@ -67,26 +72,24 @@ function Header() {
 
   //
   useEffect(() => {
-    getCategories({setCategoryDetails});
-  },[user]); 
+    getCategories({ setCategoryDetails });
+  }, [user]);
 
+  /**
+   * SET CATEGORIES LIST IN GLOBAL STATE
+   *
+   */
+  useEffect(() => {
+    //console.log("categoryDetails UPDATED:", categoryDetails);
+    if (categoryDetails) {
+      dispatch(getCat(categoryDetails));
+    }
+  }, [categoryDetails]);
 
-  /**  
-   * SET CATEGORIES LIST IN GLOBAL STATE 
-   * 
-  */
-    useEffect(() => {
-      //console.log("categoryDetails UPDATED:", categoryDetails);
-      if (categoryDetails) {
-        dispatch(getCat(categoryDetails));
-      }
-    }, [categoryDetails]);
+  //get the category data from global state
+  const categoryData = useSelector((state) => state);
 
-
-    //get the category data from global state
-    const categoryData = useSelector((state) => state);
-    
-   //console.log('categoryDetailsrrrrr',categoryData);
+  //console.log('categoryDetailsrrrrr',categoryData);
 
   return (
     <div className="shadow sticky top-0 z-50 bg-white">
@@ -132,7 +135,10 @@ function Header() {
                         to="/category"
                         onClick={() => setCategoriesOpen(false)}
                       >
-                        <li type="disk" className="w-full text-left px-4 text-sm hover:bg-green-50 hover:text-gray-500">
+                        <li
+                          type="disk"
+                          className="w-full text-left px-4 text-sm hover:bg-green-50 hover:text-gray-500"
+                        >
                           {cat.name}
                         </li>
                       </Link>
@@ -192,7 +198,7 @@ function Header() {
             <div className="flex items-center gap-2 cursor-pointer hover:text-green-700">
               <Menu as="div" className="relative inline-block">
                 <MenuButton className="inline-flex gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-black hover:bg-gray-100">
-                  <Badge badgeContent={totalItems} color="primary">
+                  <Badge badgeContent={cart.items.length} color="primary">
                     <IoCartOutline size={20} />
                   </Badge>
                   <ChevronDownIcon className="size-5 text-gray-400" />
@@ -200,24 +206,31 @@ function Header() {
 
                 <MenuItems className="absolute right-0 mt-2 w-80 rounded-md bg-gray-900 text-white shadow-xl py-2 animate-fadeIn">
                   <div className="py-2 max-h-64 overflow-y-auto">
-                    {allCartItems.length === 0 ? (
+                    {items.length === 0 ? (
                       <div className="px-4 py-4 text-sm text-gray-300 text-center">
                         Cart is empty
                       </div>
                     ) : (
-                      allCartItems.map((ele, idx) => (
-                        <MenuItem key={idx}>
+                      items.map((ele, idx) => (
+                        <MenuItem key={ele.productId?._id || idx}>
                           <div className="flex items-center justify-between px-4 py-2 text-sm hover:bg-gray-800">
                             <div className="flex items-center gap-2">
                               <img
-                                src={ele.image || ele.images}
-                                alt={ele.name || ele.brand}
+                                src={
+                                  ele.productId?.images?.[0]
+                                    ? `${import.meta.env.VITE_BASE_URL}${
+                                        ele.productId.images[0]
+                                      }`
+                                    : "/placeholder.png"
+                                }
+                                alt={ele.productId?.name}
                                 className="h-10 w-10 object-contain rounded"
                               />
-                              <span>{ele.name || ele.brand}</span>
+                              <span>{ele.productId?.name}</span>
                             </div>
+
                             <span className="text-green-400 font-semibold">
-                              Rs.{ele.price}
+                              ₹{ele.price || '-'}
                             </span>
                           </div>
                         </MenuItem>

@@ -14,12 +14,12 @@ function SecCard() {
    * RETURN ALL CATEGORIES
    */
   return (
-    <div className="bg-[#f1e6c1]  shadow min-h-screen py-10">
+    <div className="bg-[#fff6d9]  h-fit ">
       <h2 className="text-center text-xl font-semibold text-black mb-8">
         Shop By Categories
       </h2>
 
-      <div className="max-w-7xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-6 px-4 mb-10">
+      <div className="flex flex-wrap bg-[#8bbe8e] shadow w-full rounded justify-start px-15 py-5 gap-4">
         {cateData.map((cat) => (
           // Link to the category page with the category ID
           <Link 
@@ -29,7 +29,7 @@ function SecCard() {
           >
             <div
               key={cat._id}
-              className="bg-[#f1f8fe] rounded-lg shadow hover:scale-105 transition p-4 flex flex-col items-center cursor-pointer"
+              className="bg-[#f1fef1] rounded-lg shadow hover:scale-105 transition p-4 flex flex-col items-center cursor-pointer"
             >
               <img
                 src={`${import.meta.env.VITE_BASE_URL}${cat.image}`}
