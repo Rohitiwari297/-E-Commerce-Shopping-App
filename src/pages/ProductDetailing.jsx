@@ -9,16 +9,26 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { BaseURI } from "../api/axiosInstance";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCartAPI, fetchCartAPI } from "../redux/features/cart/cartSlice.js";
+import {
+  addToCartAPI,
+  fetchCartAPI,
+  updateCartQuantityAPI,
+} from "../redux/features/cart/cartSlice.js";
 
 function ProductDetailing() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  /**
+   * ALL STATES VARIABLE DECLARATION AND INITIALIZATION HERE
+   */
+  // state variable to handle the button UI
+  const [isAddedToCart, setIsAddedToCart] = React.useState(false);
+
   // Product received from navigation
   const { catData } = location.state;
-  //console.log("catId", catData);
+  console.log("catData", catData);
 
   /**
    * IMPLEMENTING ADD TO CART FUNCTIONALITY
@@ -38,12 +48,66 @@ function ProductDetailing() {
         quantity: 1,
       })
     );
+    alert("Product added to cart!");
+    dispatch(fetchCartAPI()); // refresh the cart
   };
 
-  
   // select data from cartSlicer
   const cart = useSelector((state) => state.addToCartData);
+  const { items = [] } = cart;
   console.log("cart from redux", cart);
+
+  // check if the product is already in the cart
+  useEffect(() => {
+    if (!cart?.items || !catData?._id) return;
+
+    const isInCart = cart.items.some(
+      (item) => item.productId?._id === catData._id
+    );
+
+    setIsAddedToCart(isInCart);
+  }, [cart?.items, catData?._id]);
+
+  console.log("isAddedToCart", isAddedToCart);
+
+  /**
+   * ALL FUNCTION DECLARATION HERE
+   */
+  const handleAddItems = async (catData) => {
+    const item = items.find((i) => i.productId?._id === catData._id);
+
+    if (!item) return;
+
+    const newQty = item.quantity + 1;
+
+    await dispatch(
+      updateCartQuantityAPI({
+        productId: catData._id,
+        quantity: String(newQty),
+      })
+    );
+
+    dispatch(fetchCartAPI());
+    alert("Product added from cart!");
+  };
+
+  const handleRemoveItems = async (catData) => {
+    const item = items.find((i) => i.productId?._id === catData._id);
+
+    if (!item) return;
+
+    const newQty = item.quantity - 1;
+
+    await dispatch(
+      updateCartQuantityAPI({
+        productId: catData._id,
+        quantity: String(newQty),
+      })
+    );
+
+    dispatch(fetchCartAPI());
+    alert("Product removed from cart!");
+  };
 
   return (
     <section className="max-w-6xl mx-auto px-6 py-12">
@@ -113,18 +177,42 @@ function ProductDetailing() {
             </p>
 
             <div className="flex gap-4">
-              <button
-                className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg"
-                onClick={() => additionHander(catData)}
-              >
-                Add to Cart
-              </button>
+              {isAddedToCart === true ? (
+                //buttons for increment and decrement
+                <div className="flex gap-4 border border-gray-200 p-2 rounded-2xl shadow-green-500">
+                  <button
+                    className="px-4  bg-red-500 hover:bg-red-600 text-white rounded-lg"
+                    onClick={() => handleRemoveItems(catData)}
+                  >
+                    -
+                  </button>
+                  {/* total count of selected product */}
+                  <p className="text-[14px] font-semibold">
+                    {items.find((item) => item.productId?._id === catData._id)
+                      ?.quantity || 0}
+                  </p>
+
+                  <button
+                    className="px-4  bg-green-600 hover:bg-green-700 text-white rounded-lg"
+                    onClick={() => handleAddItems(catData)}
+                  >
+                    +
+                  </button>
+                </div>
+              ) : (
+                <button
+                  className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg"
+                  onClick={() => additionHander(catData)}
+                >
+                  Add to Cart
+                </button>
+              )}
 
               <button
                 onClick={() => navigate(-1)}
-                className="px-6 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg"
+                className="px-4 -py-2  bg-gray-200 hover:bg-gray-300 rounded-2xl"
               >
-                Back
+                ←
               </button>
             </div>
           </div>

@@ -135,14 +135,23 @@ export const addToCartAPI = createAsyncThunk(
   }
 );
 
-/* ================= REMOVE FROM CART ================= */
-export const removeFromCartAPI = createAsyncThunk(
-  "cart/remove",
-  async (prod_id, { rejectWithValue }) => {
+/* ================= REMOVE FROM CART QUANTITY ================= */
+export const updateCartQuantityAPI = createAsyncThunk(
+  "cart/update",
+  async ({productId, quantity}, { rejectWithValue }) => {
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}api/cart/remove`,
-        { prod_id }
+      const token = localStorage.getItem("token")
+      const res = await axios.patch(
+        `${import.meta.env.VITE_BASE_URL}api/cart/update`,
+        { 
+          productId,
+          quantity: String(quantity)
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
       );
       return res.data;
     } catch (error) {
@@ -221,9 +230,10 @@ const cartSlice = createSlice({
         state.error = action.payload;
       })
 
-      /* REMOVE */
-      .addCase(removeFromCartAPI.fulfilled, (state, action) => {
+      /* UPDATE */
+      .addCase(updateCartQuantityAPI.fulfilled, (state, action) => {
         state.items = action.payload.items;
+        console.log("CART ITEMS RAW 👉", action.payload.data.items);
         state.totalItems = action.payload.totalItems;
         state.totalPrice = action.payload.totalPrice;
       })

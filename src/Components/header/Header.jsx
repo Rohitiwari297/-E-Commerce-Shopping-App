@@ -29,9 +29,11 @@ function Header() {
   const user = useSelector((state) => state.auth.user);
 
   // COUNT OF THE CART ITEM
-  const cart = useSelector((state) => state.addToCartData);
-  const { items } = cart;
-  console.log("rrrrrrrrrr", items[0]?.productId.name);
+  const cart = useSelector((state) => state.addToCartData || {});
+
+  const { items = [] } = cart;
+  console.log("rrrrrrrrrr", items?.[0]?.productId?.name);
+
 
   const totalItems = (addition?.length || 0) + (allproducts?.length || 0);
   const allCartItems = [...addition, ...allproducts];
@@ -198,7 +200,7 @@ function Header() {
             <div className="flex items-center gap-2 cursor-pointer hover:text-green-700">
               <Menu as="div" className="relative inline-block">
                 <MenuButton className="inline-flex gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-black hover:bg-gray-100">
-                  <Badge badgeContent={cart.items.length} color="primary">
+                  <Badge badgeContent={cart?.items?.length ?? 0} color="primary">
                     <IoCartOutline size={20} />
                   </Badge>
                   <ChevronDownIcon className="size-5 text-gray-400" />
