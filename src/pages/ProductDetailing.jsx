@@ -11,6 +11,7 @@ import { BaseURI } from "../api/axiosInstance";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addToCartAPI,
+  clearCartAPI,
   fetchCartAPI,
   updateCartQuantityAPI,
 } from "../redux/features/cart/cartSlice.js";
@@ -97,6 +98,15 @@ function ProductDetailing() {
     if (!item) return;
 
     const newQty = item.quantity - 1;
+
+    if (newQty > 0) {
+      return dispatch(
+        clearCartAPI({
+          productId: catData._id,
+          quantity: String(0),
+        })
+      )
+    };
 
     await dispatch(
       updateCartQuantityAPI({
