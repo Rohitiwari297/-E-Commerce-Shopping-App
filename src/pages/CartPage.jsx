@@ -1,51 +1,62 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
-import AddressModalPage from "./AddressModalPage "; // ✅ fixed import path
+import AddressModalPage from "./AddressModalPage "; // import the AddressModalPage component
 import { MdLocationOn } from "react-icons/md";
+import { fetchCartAPI, updateCartQuantityAPI } from "../redux/features/cart/cartSlice";
 
 function CartPage() {
-  // fetch data from store
-  const { cart } = useSelector((state) => state.dataToCart);
-  console.log("Redux cart:", cart);
 
+  //
   // modal state
   const [openAddressModal, setOpenAddressModal] = useState(false);
-  const [confirmAddress, setConfirmAddress] = useState(true)
 
-  // navigation
+  //
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  // fetch data from store
+  const  {items = [], totalItems, totalPrice}  = useSelector((state) => state.addToCartData);
+  console.log("Redux cart:", items, totalPrice);
+  // total discount
+  const totalDiscount = items.map((i) => i?.productId?.originalPrice).reduce((total, item) => total + item, 0);
+  console.log("totalDiscount",  totalDiscount);
 
   // get user details from store
   const { user } = useSelector((state) => state.auth);
   console.log("Redux user:", user);
 
-  // get items from location state
-  const location = useLocation();
-  const { items } = location.state || {};
 
-  console.log("Location items:", items);
-
-  // local cart state
-  const [cartData, setCartData] = useState(
-    items?.map((item) => ({
-      ...item,
-      quantity: item.quantity ?? 1,
-    })) || []
+const getItemCount = (productId) => {
+  console.log("productId", productId);
+  const foundItem = items.find(
+    (i) => i?.productId?._id === productId
   );
+  console.log("foundItem", foundItem?.quantity);
+  return foundItem?.quantity || 0;
+};
+
+
+ 
 
   // increase/decrease quantity
-  const handleQuantityChange = (id, delta) => {
-    setCartData((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, (item.quantity ?? 1) + delta) }
-          : item
-      )
-    );
-  };
+const handleQuantityChange = async (item) => {
+  const productId = item?.productId?._id;
+
+  //console.log("productId", productId);
+
+  await dispatch(
+    updateCartQuantityAPI({
+      productId,                     
+      quantity: getItemCount(productId) + 1,
+    })
+  );
+
+  dispatch(fetchCartAPI());
+};
+
 
   //handlePlaceOrder
   const handlePlaceOrder = () => {
@@ -63,19 +74,8 @@ function CartPage() {
     setCartData((prev) => prev.filter((item) => item.id !== id));
   };
 
-  // price calculations
-  const totalPrice = cartData.reduce((acc, item) => {
-    const price = Number(item.price ?? 330);
-    const quantity = Number(item.quantity ?? 1);
-    return acc + price * quantity;
-  }, 0);
 
-  const discount = cartData.reduce((acc, item) => {
-    const originalPrice = Number(item.originalPrice ?? 1999);
-    const price = Number(item.price ?? 330);
-    const quantity = Number(item.quantity ?? 1);
-    return acc + (originalPrice - price) * quantity;
-  }, 0);
+
 
   return (
     <div className="container mx-auto p-6 flex flex-col lg:flex-row gap-6">
@@ -83,23 +83,26 @@ function CartPage() {
       
       {/* Cart Items */}
       <div className="flex-1 flex flex-col gap-4">
-        {cartData.map((item) => (
+        {items.map((item) => (
           <div
-            key={item.id}
+            key={item?.productId?.id}
             className="flex gap-4 p-4 border rounded-md bg-white"
           >
-            <img src={item.image} alt={item.name} className="w-24 h-24" />
+            <img src={`${import.meta.env.VITE_BASE_URL}${item?.productId?.images[0]}` } alt={item.name} className="w-24 h-24" />
+            {console.log("images", item?.productId?.images[0])}
             <div className="flex-1 flex flex-col justify-between">
               <div>
-                <h2 className="font-semibold">{item.name}</h2>
-                <p className="text-sm text-gray-500">Size: {item.size}</p>
-                <p className="text-sm text-gray-500">Seller: {item.seller}</p>
-                <p className="text-green-600 font-bold">
+                <h2 className="font-semibold">{item?.productId?.name}</h2>
+                <p className="text-sm text-gray-500">Size: {item?.productId?.size}</p>
+                <p className="text-sm text-gray-500">Seller: {item?.productId?.seller}</p>
+                <p className="flex  gap-5 text-green-600 font-bold">
                   ₹{item.price ?? 330}{" "}
                   <span className="line-through text-gray-400 text-sm">
-                    ₹{item.originalPrice ?? 1999}
+                    ₹{item?.productId?.originalPrice}
+                    {console.log("originalPrice", items?.productId?.originalPrice)}
                   </span>{" "}
-                  {item.discount ?? 85}% Off
+                  {/* <p>{Math.floor((Number(item?.productId?.originalPrice) - Number(item.price))/Number(item?.productId?.originalPrice) * 100)}% Off</p> */}
+
                 </p>
                 <p className="text-sm text-gray-500">
                   Delivery by {item.delivery ?? "Thu Oct 9"}
@@ -109,14 +112,14 @@ function CartPage() {
                 <div className="flex items-center border rounded">
                   <button
                     className="px-2"
-                    onClick={() => handleQuantityChange(item.id, -1)}
+                    onClick={() => handleQuantityChange(item?.productId?._id)}
                   >
                     -
                   </button>
                   <span className="px-2">{item.quantity ?? 1}</span>
                   <button
                     className="px-2"
-                    onClick={() => handleQuantityChange(item.id, 1)}
+                    onClick={() => handleQuantityChange(item)}
                   >
                     +
                   </button>
@@ -160,12 +163,12 @@ function CartPage() {
       </div>
         <h2 className="font-semibold text-lg mb-4">PRICE DETAILS</h2>
         <div className="flex justify-between mb-2">
-          <span>Price ({cartData.length} items)</span>
-          <span>₹{totalPrice + discount}</span>
+          <span>Total Payable ({totalItems} items)</span>
+          <span>₹{totalPrice + 0}</span>
         </div>
         <div className="flex justify-between mb-2 text-green-600">
-          <span>Discount</span>
-          <span>− ₹{discount}</span>
+          <span>Total Discount</span>
+          <span>− ₹{  totalDiscount}</span>
         </div>
         <div className="flex justify-between mb-2">
           <span>Coupons for you</span>
@@ -181,7 +184,7 @@ function CartPage() {
           <span>₹{totalPrice}</span>
         </div>
         <p className="text-green-600 text-sm mb-4">
-          You will save ₹{discount} on this order
+          You will save ₹{"discount: 0"} on this order.
         </p>
 
         {/* Place Order Button */}

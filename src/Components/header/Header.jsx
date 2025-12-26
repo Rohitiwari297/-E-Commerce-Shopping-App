@@ -33,7 +33,7 @@ const { items = [] } = useSelector(
   (state) => state.addToCartData || {}
 );
 
-console.log("Cart Itemssssss:", items);
+//console.log("Cart Itemssssss:", items);
 
 
 
@@ -216,6 +216,7 @@ console.log("Cart Itemssssss:", items);
                       </div>
                     ) : (
                       items.map((ele, idx) => (
+                        //console.log(" ele from cart",ele), 
                         <MenuItem key={ele.productId?._id || idx}>
                           <div className="flex items-center justify-between px-4 py-2 text-sm hover:bg-gray-800">
                             <div className="flex items-center gap-2">
@@ -242,16 +243,18 @@ console.log("Cart Itemssssss:", items);
                     )}
                   </div>
 
-                  {allCartItems.length > 0 && (
-                    <Link to="/cartPage" state={{ items: allCartItems }}>
+                  {items.length > 0 && (
+                    
                       <div className="p-3 border-t border-gray-800 flex justify-center">
+                        <Link to="/cartPage" state={{ items: allCartItems }}>
                         <MenuItem>
-                          <button className="w-1/2 py-2 text-center text-sm rounded-xl font-semibold text-white bg-green-600 hover:bg-green-700">
+                          <button className="w-[150px] py-2 text-center text-sm rounded-xl font-semibold text-white bg-green-600 hover:bg-green-700">
                             View Cart
-                          </button>
+                          </button>                           
                         </MenuItem>
+                        </Link>
                       </div>
-                    </Link>
+                   
                   )}
                 </MenuItems>
               </Menu>

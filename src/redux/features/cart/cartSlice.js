@@ -139,6 +139,7 @@ export const addToCartAPI = createAsyncThunk(
 export const updateCartQuantityAPI = createAsyncThunk(
   "cart/update",
   async ({productId, quantity}, { rejectWithValue }) => {
+    console.log('productId:', productId,"quantity:", quantity)
     try {
       const token = localStorage.getItem("token")
       const res = await axios.patch(
@@ -157,7 +158,8 @@ export const updateCartQuantityAPI = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }
-  }
+  },
+  
 );
 
 /* ================= FETCH CART (on refresh) ================= */

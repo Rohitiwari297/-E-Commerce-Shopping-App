@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addToAddition, removeFromAddition } from "../redux/features/addition";
 import { Link, useLocation } from "react-router-dom";
+import {
+  addToCartAPI,
+  fetchCartAPI,
+  updateCartQuantityAPI,
+} from "../redux/features/cart/cartSlice";
 
 // Example images (replace with your actual imports)
 
@@ -9,74 +13,99 @@ import { getProductDetsils } from "../redux/features/product/productSlice";
 
 function Category() {
   const dispatch = useDispatch();
-  const cartData = useSelector((state) => state.additionSlice.addition); // cart items
 
-  /**
-   * GET CATEGORY ID FROM THE URL
-   * FOR GETTING DATA FROM THE API
-   */
   const location = useLocation();
   const { catId } = location.state || {};
-  console.log("catId", catId);
 
-  /**
-   * GET ALL CATEGORIES DATA FROM THE GLOBAL STATE
-   * FOR THE SIDEBAR / FILTER
-   */
   const { catData } = useSelector((state) => state.cateData);
+  const prodData =
+    useSelector((state) => state.prodData?.prodDetails?.products) || [];
 
-  /**
-   * GET ALL PRODUCTS DATA FROM THE GLOBAL STATE
-   */
-  const prodData = useSelector(
-    (state) => state.prodData?.prodDetails?.products || []
-  );
+  const items = useSelector((state) => state.addToCartData?.items || []);
 
-  console.log("prodListtttt", prodData);
-
-  /**
-   * GET ALL CART DATA FROM THE GLOBAL STATE
-   */
-  const { items } = useSelector((state) => state.addToCartData);
-  console.log("totalCartItems", items);
-
+  /* =========================
+     FETCH PRODUCTS BY CATEGORY
+  ========================== */
   useEffect(() => {
     if (catId) {
+      //alert(catId);
       dispatch(getProductDetsils(catId));
     }
-  }, [catId]);
+  }, [catId, dispatch]);
 
-  /// function to filter the products based on category id which is for the sidebar
+  /* =========================
+     FETCH CART ONLY ONCE
+  ========================== */
+  useEffect(() => {
+    dispatch(fetchCartAPI());
+  }, [dispatch]);
+
+  /* =========================
+     FILTER PRODUCTS
+  ========================== */
   const filterProducts = (id) => {
-    console.log("id", id);
-
+    alert(id);
     if (id) {
-      alert(id);
       dispatch(getProductDetsils(id));
     }
   };
 
-  // Add item to cart
-  const handleAdd = (item) => {
-    dispatch(addToAddition(item));
-  };
-
-  // Remove item from cart
-  const handleRemove = (item) => {
-    console.log("Removing item:", item);
-    dispatch(removeFromAddition(item));
-  };
-
-  /*================
-    COUT OF STOCK AND UPDATE THE BUTTON ACCORDINGLY
-====================*/
-  // Cart me product ki quantity
+  /* =========================
+     GET CART ITEM COUNT
+  ========================== */
   const getItemCount = (product) => {
     if (!product?._id) return 0;
 
     const foundItem = items.find((i) => i?.productId?._id === product._id);
 
     return foundItem?.quantity || 0;
+  };
+
+  if (!catData) {
+    return <div>Loading...</div>;
+  }
+
+  /* =========================
+     ADD TO CART
+  ========================== */
+  const addToCartHandler = async (product) => {
+    await dispatch(
+      addToCartAPI({
+        productId: product._id,
+        quantity: 1,
+      })
+    );
+
+    // fetch updated cart after add
+    dispatch(fetchCartAPI());
+  };
+
+  /* =========================
+     INCREASE QUANTITY
+  ========================== */
+  const increaseQuantity = async (product) => {
+    await dispatch(
+      updateCartQuantityAPI({
+        productId: product._id,
+        quantity: getItemCount(product) + 1,
+      })
+    );
+
+    dispatch(fetchCartAPI());
+  };
+
+  /* =========================
+     DECREASE QUANTITY
+  ========================== */
+  const decreaseQuantity = async (product) => {
+    await dispatch(
+      updateCartQuantityAPI({
+        productId: product._id,
+        quantity: String(getItemCount(product) - 1),
+      })
+    );
+
+    dispatch(fetchCartAPI());
   };
 
   return (
@@ -126,10 +155,12 @@ function Category() {
                   alt="product-img"
                   className="w-24 h-24 object-contain"
                 />
-                <p className="text-sm mt-2 font-semibold">{cat.name}</p>
-                <p className="text-center text-gray-800 text-[12px]">
-                  {cat.description}
-                </p>
+                <div className="flex flex-col justify-center items-center">
+                  <p className="text-sm mt-2 font-semibold">{cat.name}</p>
+                  <p className="text-center text-gray-800 text-[12px]">
+                    {cat.description}
+                  </p>
+                </div>
                 <div className="w-full flex space-x-2 justify-center items-center">
                   <p className="mt-2 text-center font-medium text-[15px] text-green-900">
                     Rs.{cat.currentPrice}
@@ -141,17 +172,17 @@ function Category() {
               </Link>
 
               {/* Add/Remove Buttons */}
-              {getItemCount(cat) > 0 ? (
-                <div className="flex justify-center items-center space-x-2 w-full mt-3 ">
+              {getItemCount(cat) > 0 && "pending state " ? (
+                <div className="flex gap-4 border border-gray-200 p-2 rounded-2xl shadow-green-500 ">
                   <button
-                    onClick={() => handleRemove(cat)}
+                    onClick={() => decreaseQuantity(cat)}
                     className="bg-red-500 text-white rounded-[8px] text-xl w-10 h- flex items-center justify-center"
                   >
                     -
                   </button>
                   <p>{getItemCount(cat)}</p>
                   <button
-                    onClick={() => handleAdd(cat)}
+                    onClick={() => increaseQuantity(cat)}
                     className="bg-green-500 text-white rounded-[8px] text-xl w-10 h- flex items-center justify-center"
                   >
                     +
@@ -159,8 +190,9 @@ function Category() {
                 </div>
               ) : (
                 <button
-                  onClick={() => handleAdd(cat)}
+                  onClick={() => addToCartHandler(cat)}
                   className="w-full hover:bg-green-800 cursor-pointer h-auto p-2 bg-green-700 border rounded-xl text-white font-semibold text-sm mt-3"
+                  type="button"
                 >
                   Add to Cart
                 </button>
