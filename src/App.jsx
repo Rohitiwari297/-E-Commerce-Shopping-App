@@ -6,9 +6,9 @@ import MainRouter from './mainRouter/MainRouter'
 import Login from './pages/Login';
 import Footer from './Components/footer/Footer';
 import Register from './pages/Register';
-import Category from './pages/Category';
+import Category from './pages/CategoryPages/Category';
 import ProductDetailing from './pages/ProductDetailing';
-import CartPage from './pages/CartPage'
+import CartPage from './pages/CartPages/CartPage'
 import DeliveryHistory from './pages/DeliveryHistory';
 import PaymentPage from './pages/PaymentPage';
 import OrderHistory from './pages/OderHistory';

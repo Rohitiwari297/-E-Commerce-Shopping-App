@@ -112,16 +112,16 @@ import axios from "axios";
 /* ================= ADD TO CART ================= */
 export const addToCartAPI = createAsyncThunk(
   "cart/add",
-  async ({ productId, quantity}, { rejectWithValue }) => {
+  async ({ productId, quantity }, { rejectWithValue }) => {
     try {
 
       const token = localStorage.getItem("token")
       const res = await axios.post(
         `${import.meta.env.VITE_BASE_URL}api/cart/add`,
-        { 
-           productId, 
-           quantity
-         },
+        {
+          productId,
+          quantity
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -138,13 +138,13 @@ export const addToCartAPI = createAsyncThunk(
 /* ================= REMOVE FROM CART QUANTITY ================= */
 export const updateCartQuantityAPI = createAsyncThunk(
   "cart/update",
-  async ({productId, quantity}, { rejectWithValue }) => {
-    console.log('productId:', productId,"quantity:", quantity)
+  async ({ productId, quantity }, { rejectWithValue }) => {
+    console.log('productId:', productId, "quantity:", quantity)
     try {
       const token = localStorage.getItem("token")
       const res = await axios.patch(
         `${import.meta.env.VITE_BASE_URL}api/cart/update`,
-        { 
+        {
           productId,
           quantity: String(quantity)
         },
@@ -159,7 +159,7 @@ export const updateCartQuantityAPI = createAsyncThunk(
       return rejectWithValue(error.response?.data || error.message);
     }
   },
-  
+
 );
 
 /* ================= FETCH CART (on refresh) ================= */
@@ -220,10 +220,22 @@ const cartSlice = createSlice({
       })
       .addCase(addToCartAPI.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload.data.items;
-        console.log("CART ITEMS RAW 👉", action.payload.data.items);
+        // Merge logic: Preserve populated productId if available
+        const newItems = action.payload.data.items;
+        state.items = newItems.map((newItem) => {
+          const newItemId = newItem.productId._id || newItem.productId;
+          const existingItem = state.items.find((old) => {
+            const oldId = old.productId._id || old.productId;
+            return oldId === newItemId;
+          });
 
-        //console.log("CART API RESPONSE 👉", action.payload);
+          if (existingItem && typeof existingItem.productId === 'object') {
+            return { ...newItem, productId: existingItem.productId };
+          }
+          return newItem;
+        });
+
+        console.log("CART ITEMS MERGED 👉", state.items);
         state.totalItems = action.payload.data.totalItems;
         state.totalPrice = action.payload.data.totalPrice;
       })
@@ -234,10 +246,24 @@ const cartSlice = createSlice({
 
       /* UPDATE */
       .addCase(updateCartQuantityAPI.fulfilled, (state, action) => {
-        state.items = action.payload.items;
-        console.log("CART ITEMS RAW 👉", action.payload.data.items);
-        state.totalItems = action.payload.totalItems;
-        state.totalPrice = action.payload.totalPrice;
+        // Merge logic: Preserve populated productId if available
+        const newItems = action.payload.data.items;
+        state.items = newItems.map((newItem) => {
+          const newItemId = newItem.productId._id || newItem.productId;
+          const existingItem = state.items.find((old) => {
+            const oldId = old.productId._id || old.productId;
+            return oldId === newItemId;
+          });
+
+          if (existingItem && typeof existingItem.productId === 'object') {
+            return { ...newItem, productId: existingItem.productId };
+          }
+          return newItem;
+        });
+
+        console.log("CART ITEMS MERGED 👉", state.items);
+        state.totalItems = action.payload.data.totalItems;
+        state.totalPrice = action.payload.data.totalPrice;
       })
 
       /* FETCH */
