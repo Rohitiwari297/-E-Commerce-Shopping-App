@@ -106,7 +106,7 @@ const CartItem = React.memo(({ item }) => {
                 </div>
             </div>
             <Link to={"/category/itemDetails/"} state={{ item }}>
-                <h5>View Product Details</h5>
+                <button>View Product Details</button>
             </Link>
         </div>
     );

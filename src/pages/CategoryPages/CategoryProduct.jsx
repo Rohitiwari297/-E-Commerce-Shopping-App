@@ -8,6 +8,7 @@ import {
 } from "../../redux/features/cart/cartSlice";
 
 const CategoryProduct = React.memo(({ cat }) => {
+  console.log("CategoryProduct RENDER:", cat._id, "Images:", cat.images);
   const dispatch = useDispatch();
 
   // OPTIMIZATION: Select ONLY the quantity for this specific product.
@@ -26,6 +27,7 @@ const CategoryProduct = React.memo(({ cat }) => {
       addToCartAPI({
         productId: product._id,
         quantity: 1,
+        productDetails: product, // Pass full details for optimistic/manual population
       })
     );
   };

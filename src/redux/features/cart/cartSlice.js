@@ -220,10 +220,14 @@ const cartSlice = createSlice({
       })
       .addCase(addToCartAPI.fulfilled, (state, action) => {
         state.loading = false;
-        // Merge logic: Preserve populated productId if available
+        // Merge logic: Preserve populated productId if available OR use passed details
         const newItems = action.payload.data.items;
+        const sentDetails = action.meta.arg.productDetails; // Access passed full details
+
         state.items = newItems.map((newItem) => {
           const newItemId = newItem.productId._id || newItem.productId;
+
+          // 1. Try to find existing populated item
           const existingItem = state.items.find((old) => {
             const oldId = old.productId._id || old.productId;
             return oldId === newItemId;
@@ -232,10 +236,16 @@ const cartSlice = createSlice({
           if (existingItem && typeof existingItem.productId === 'object') {
             return { ...newItem, productId: existingItem.productId };
           }
+
+          // 2. If new item and we have sentDetails, use them!
+          if (sentDetails && sentDetails._id === newItemId) {
+            return { ...newItem, productId: sentDetails };
+          }
+
           return newItem;
         });
 
-        console.log("CART ITEMS MERGED 👉", state.items);
+        console.log("CART ITEMS MERGED (ADD) 👉", state.items);
         state.totalItems = action.payload.data.totalItems;
         state.totalPrice = action.payload.data.totalPrice;
       })
@@ -261,7 +271,7 @@ const cartSlice = createSlice({
           return newItem;
         });
 
-        console.log("CART ITEMS MERGED 👉", state.items);
+        console.log("CART ITEMS MERGED (UPDATE) 👉", state.items);
         state.totalItems = action.payload.data.totalItems;
         state.totalPrice = action.payload.data.totalPrice;
       })
