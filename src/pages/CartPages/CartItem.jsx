@@ -6,6 +6,8 @@ import { updateCartQuantityAPI } from "../../redux/features/cart/cartSlice.js";
 const CartItem = React.memo(({ item }) => {
     const dispatch = useDispatch();
 
+    console.log("CartItem RENDER:", item);
+
     const handleIncreaseQuantity = async () => {
         // Check if productId is an object (populated) or string
         const productId = item?.productId?._id || item?.productId || item?.id;
@@ -105,9 +107,10 @@ const CartItem = React.memo(({ item }) => {
                     </button>
                 </div>
             </div>
-            <Link to={"/category/itemDetails/"} state={{ item }}>
+            {/* <Link to={"/category/itemDetails/"} state={{ List: item}}>
                 <button>View Product Details</button>
-            </Link>
+            </Link> */}
+            <button className="text-blue-600 hover:underline -mt-32" onClick={()=> {alert('working on it')}} >Go Back</button>
         </div>
     );
 }, (prevProps, nextProps) => {

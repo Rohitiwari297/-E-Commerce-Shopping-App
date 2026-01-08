@@ -15,6 +15,8 @@ function Category() {
   const prodData =
     useSelector((state) => state.prodData?.prodDetails?.products) || [];
 
+    console.log("prodData", prodData);
+
   /* =========================
      FETCH PRODUCTS BY CATEGORY
   ========================== */

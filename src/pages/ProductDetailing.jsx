@@ -11,7 +11,6 @@ import { BaseURI } from "../api/axiosInstance";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addToCartAPI,
-  clearCartAPI,
   fetchCartAPI,
   updateCartQuantityAPI,
 } from "../redux/features/cart/cartSlice.js";
@@ -36,7 +35,7 @@ function ProductDetailing() {
    * AFTER CLICKING THE ADD TO CART BUTTON, GETTING THE DATA FROM THE STORE FOR THE UPDATED BUTTON UI
    */
   const user = useSelector((state) => state.auth.user);
-  const additionHander = (cartData) => {
+  const additionHander = () => {
     if (!user) {
       navigate("/login");
       return;
@@ -49,7 +48,7 @@ function ProductDetailing() {
         quantity: 1,
       })
     );
-    alert("Product added to cart!");
+    //alert("Product added to cart!");
     dispatch(fetchCartAPI()); // refresh the cart
   };
 
@@ -89,7 +88,7 @@ function ProductDetailing() {
     );
 
     dispatch(fetchCartAPI());
-    alert("Product added from cart!");
+    //alert("Product added from cart!");
   };
 
   const handleRemoveItems = async (catData) => {
@@ -99,15 +98,6 @@ function ProductDetailing() {
 
     const newQty = item.quantity - 1;
 
-    if (newQty > 0) {
-      return dispatch(
-        clearCartAPI({
-          productId: catData._id,
-          quantity: String(0),
-        })
-      )
-    };
-
     await dispatch(
       updateCartQuantityAPI({
         productId: catData._id,
@@ -116,7 +106,7 @@ function ProductDetailing() {
     );
 
     dispatch(fetchCartAPI());
-    alert("Product removed from cart!");
+    //alert("Product added from cart!");
   };
 
   return (

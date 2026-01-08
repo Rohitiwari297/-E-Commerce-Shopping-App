@@ -30,10 +30,10 @@ function MainRouter() {
       {/* Cards Section */}
       <div className="w-full px-2 sm:px-4 space-y-6">
         <FourthCard />
-        <FifCard img={chalImg} />
+        {/* <FifCard img={chalImg} />
         <FourthCard />
         <SixCars />
-        <FifCard img={chalImg} />
+        <FifCard img={chalImg} /> */}
       </div>
 
     </div>

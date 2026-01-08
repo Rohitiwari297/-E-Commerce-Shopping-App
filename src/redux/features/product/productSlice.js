@@ -10,10 +10,10 @@ export const getProductDetsils = createAsyncThunk(
     async (id , thunkAPI) => {
         try {
             if(id){
-                const response = await axiosInstance.get(`/api/products?category=${id}`)
+                const response = await axiosInstance.get(`/api/products?category=${id}&limit=20`)
                 return response.data.data;  // backend se jo data aa raha hai
             }else {
-                const response = await axiosInstance.get(`/api/products`)
+                const response = await axiosInstance.get(`/api/products?limit=24`)
                 return response.data.data;  // backend se jo data aa raha hai
             }
         } catch (error) {

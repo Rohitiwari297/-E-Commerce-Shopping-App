@@ -186,12 +186,31 @@ export const fetchCartAPI = createAsyncThunk(
 /* ================= CLEAR CART ================= */
 export const clearCartAPI = createAsyncThunk(
   "cart/clear",
-  async (_, { rejectWithValue }) => {
+  async ({id}, { rejectWithValue }) => {
+    console.log("idddd:", id)
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_BASE_URL}api/cart/clear`
-      );
-      return res.data;
+      const token = localStorage.getItem("token")
+      if (id){
+        const res = await axios.delete(
+          `${import.meta.env.VITE_BASE_URL}/api/cart/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+        return res.data;
+      }else{
+        const res = await axios.delete(
+          `${import.meta.env.VITE_BASE_URL}/api/cart`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+        return res.data;
+      }
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }
