@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import {
   addToCartAPI,
-  fetchCartAPI,
   updateCartQuantityAPI,
 } from "../../redux/features/cart/cartSlice";
 

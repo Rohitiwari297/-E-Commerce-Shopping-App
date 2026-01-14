@@ -186,13 +186,13 @@ export const fetchCartAPI = createAsyncThunk(
 /* ================= CLEAR CART ================= */
 export const clearCartAPI = createAsyncThunk(
   "cart/clear",
-  async ({id}, { rejectWithValue }) => {
+  async (id, { rejectWithValue }) => {
     console.log("idddd:", id)
     try {
       const token = localStorage.getItem("token")
       if (id){
         const res = await axios.delete(
-          `${import.meta.env.VITE_BASE_URL}/api/cart/${id}`,
+          `${import.meta.env.VITE_BASE_URL}api/cart/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`

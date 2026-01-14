@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getProductDetsils } from "../../redux/features/product/productSlice.js";
-import { addToCartAPI, fetchCartAPI, updateCartQuantityAPI } from "../../redux/features/cart/cartSlice.js";
+import { addToCartAPI, clearCartAPI, fetchCartAPI, updateCartQuantityAPI } from "../../redux/features/cart/cartSlice.js";
 
 function FourthCard() {
   const dispatch = useDispatch();
@@ -39,6 +39,13 @@ function FourthCard() {
   };
 
   const handleDeleteItems = async (item) => {
+    if (getItemQuantity(item) === 1) {
+      const id = item._id;
+      await dispatch(
+        clearCartAPI(id)  /// clearCartAPI re-randering issue -> working on it [10-jan-25]
+      )
+      dispatch(fetchCartAPI());
+    };
     await dispatch(
       updateCartQuantityAPI({
         productId: item._id,
