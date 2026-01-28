@@ -1,100 +1,137 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import {  getAddress, saveAddress } from "../utils/Apis";
+import { Pen, Trash } from "lucide-react";
+import { Button } from "@headlessui/react";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
-const AddressModalPage = ({ onClose }) => {
+const AddressModalPage = ({ onClose, onSelectAddress  }) => {
+  const navigate = useNavigate();
+  // All Address
+   const [address, setAddress] = useState([]);
+      useEffect(()=> {
+      getAddress(setAddress)
+    },[])
+    
+  //Selected Address
+
+  
+  
+  const [selectedOption, setSelectedOption] = useState({
+    locationType: "",
+    name: "",
+    email: "",
+    mobile: "",
+    city: "",
+    state: "",
+    pincode: "",
+  });
+
+  const handleChange = (e) => {
+    setSelectedOption({
+      ...selectedOption,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    saveAddress(selectedOption);
+    onClose();
+  };
+
+  // Function to handle address selection
+  const handleSelectAddress = (item) => {
+    onSelectAddress(item);
+    localStorage.setItem("selectedAddress", JSON.stringify(item));
+    onClose();
+
+  };
+
   return (
-    <div className="w-full max-h-[90vh] flex flex-col lg:flex-row rounded-lg overflow-hidden border border-gray-200  bg-white">
-      {/* Left side (Map + Location Info) */}
-      <div className="w-full lg:w-1/2 relative mt-6 ml-6 border border-gray-200 mb-5">
-        <iframe
-          title="Address Map"
-          width="100%"
-          height="100%"
-          loading="lazy"
-          allowFullScreen
-          src="https://www.google.com/maps?q=6/13,+DLE+Industrial+Area,+Moti+Nagar,+New+Delhi&output=embed"
-          className="h-[400px] lg:h-full"
-        ></iframe>
+    <div className="w-full max-h-[90vh] flex flex-col lg:flex-row rounded-lg overflow-hidden border bg-white">
+      
+      {/* LEFT : MAP */}
+      <div className="w-full h-[400px] overflow-y-scroll lg:w-1/2 relative m-6 border border-gray-200 rounded-2xl">
+          {address.length > 0 ?address.map((item, index) => (
+          <div onClick={() => 
+            { handleSelectAddress(item) }
+          }  key={index} className="p-2 text-[12px] h-auto shadow cursor-pointer hover:bg-gray-100">
+                <div className="flex justify-between">
+                  <p className="font-semibold">{item.name}</p>
+                <div className="flex gap-1 justify-end">
+                  <Button>
+                    <Pen onClick={()=> toast.error('work is pending...')} className="relative size-3 down-2 right-2 cursor-pointer text-green-500" />
+                  </Button>
+                  <Button onClick={()=> toast.error('work is pending...')} className="flex flex-col hover:bg-gray-100">
+                    <Trash className="relative size-3 down-2 right-2 cursor-pointer text-red-500 " />
+                  </Button>
+                  
 
-        <div className="absolute bottom-0 left-0 right-0 bg-white p-3 border-t text-sm">
-          <p className="font-semibold">Delivering your order to</p>
-          <p className="text-gray-600">
-            DLE Industrial Area, Moti Nagar, New Delhi
-          </p>
-        </div>
+                </div>
+                </div>
+                  
+                <p>{item.email}</p>
+                <p>{item.mobile}</p>
+                <p>{item.city}, {item.state} - {item.pincode}</p>
+               
+              
+         
+          </div>
+        )):
+        <div className="w-full h-full">
+            Please Add Address
+          </div>
+        }
       </div>
 
-      {/* Right side (Form) */}
-      <div className="w-full lg:w-1/2 p-6 overflow-y-auto ">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-bold text-black text-center border w-full border-gray-700 rounded-md px-4 py-1">
-            Enter complete address
-          </h2>
-          {/* <button
-            // onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
-          >
-            ×
-          </button> */}
+      {/* RIGHT : FORM */}
+      <div className="w-full lg:w-1/2 p-6 overflow-y-auto">
+        <h2 className="text-lg font-bold text-center border rounded-md py-1 mb-4">
+          Enter complete address
+        </h2>
+
+        {/* LOCATION TYPE */}
+        <div className="flex gap-4 mb-4">
+          <label>
+            <input
+              type="radio"
+              name="locationType"
+              value="home"
+              checked={selectedOption.locationType === "home"}
+              onChange={handleChange}
+            />{" "}
+            Home
+          </label>
+
+          <label>
+            <input
+              type="radio"
+              name="locationType"
+              value="work"
+              checked={selectedOption.locationType === "work"}
+              onChange={handleChange}
+            />{" "}
+            Work
+          </label>
         </div>
 
-        {/* Save address as */}
-        <div className="flex gap-3 mb-4">
-          {["Home", "Work", "Hotel", "Other"].map((type) => (
-            <button
-              key={type}
-              className={`px-4 py-2 border rounded-md ${
-                type === "Home" ? "bg-green-100 border-green-600" : ""
-              }`}
-            >
-              {type}
-            </button>
-          ))}
+        {/* INPUTS */}
+        <div className="flex flex-col gap-2">
+          <input name="name" placeholder="Name*" value={selectedOption.name} onChange={handleChange} className="border p-1 rounded" />
+          <input name="email" placeholder="Email*" value={selectedOption.email} onChange={handleChange} className="border p-1 rounded" />
+          <input name="mobile" placeholder="Mobile*" value={selectedOption.mobile} onChange={handleChange} className="border p-1 rounded" />
+          <input name="city" placeholder="City*" value={selectedOption.city} onChange={handleChange} className="border p-1 rounded" />
+          <input name="state" placeholder="State*" value={selectedOption.state} onChange={handleChange} className="border p-1 rounded" />
+          <input name="pincode" placeholder="Pincode*" value={selectedOption.pincode} onChange={handleChange} className="border p-1 rounded" />
         </div>
 
-        {/* Address form inputs */}
-        <div className="flex flex-col gap-1">
-          <input
-            type="text"
-            placeholder="Flat / House no / Building name *"
-            className="border rounded-md p-1"
-          />
-          <input
-            type="text"
-            placeholder="Floor (optional)"
-            className="border rounded-md p-1"
-          />
-          <input
-            type="text"
-            placeholder="Area / Sector / Locality *"
-            className="border rounded-md p-1"
-            defaultValue="DLE Industrial Area, Moti Nagar, New Delhi"
-          />
-          <input
-            type="text"
-            placeholder="Nearby landmark (optional)"
-            className="border rounded-md p-1"
-          />
-          <input
-            type="text"
-            placeholder="Your name *"
-            className="border rounded-md p-1"
-          />
-          <input
-            type="tel"
-            placeholder="Your phone number *"
-            className="border rounded-md p-1"
-            defaultValue="0000000000"
-          />
-        </div>
-
-        {/* Save button */}
+        {/* BUTTON */}
         <button
-          onClick={onClose}
-          
+          onClick={handleFormSubmit}
           className="w-full bg-green-700 text-white py-3 mt-5 rounded-md font-semibold hover:bg-green-800"
         >
-          Save Address
+          Add Address
         </button>
       </div>
     </div>

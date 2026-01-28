@@ -74,8 +74,8 @@ export default function ProductCarousel() {
   console.log(" bannersData", bannersData);
 
   return (
-    <div className="w-full bg-[#fff6d9] py-5">
-      <h6 className="text-sm md:text-xl font-semibold text-center mb-4">
+    <div className="w-full bg-[#fff6d9] mb-3 md:mb-0 ">
+      <h6 className="text-[20px] md:text-xl font-semibold text-center mb-4">
         Trending Deals
       </h6>
 
@@ -87,7 +87,21 @@ export default function ProductCarousel() {
           disableOnInteraction: false,
           pauseOnMouseEnter: true,
         }}
-        slidesPerView={3}
+        slidesPerView={1}
+        breakpoints={{
+          0: {
+            slidesPerView: 1,
+          },
+          480: {
+            slidesPerView: 2,
+          },
+          768: {
+            slidesPerView: 2,
+          },
+          1024: {
+            slidesPerView: 3,
+          },
+        }}
         modules={[Autoplay]}
         className="px-5"
       >

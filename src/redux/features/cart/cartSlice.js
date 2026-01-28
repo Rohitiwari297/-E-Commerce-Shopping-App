@@ -304,11 +304,27 @@ const cartSlice = createSlice({
         state.items = action.payload.data.items
       })
 
-      /* CLEAR */
-      .addCase(clearCartAPI.fulfilled, (state) => {
-        state.items = [];
-        state.totalItems = 0;
-        state.totalPrice = 0;
+      // /* CLEAR */
+      // .addCase(clearCartAPI.fulfilled, (state) => {
+      //   state.items = [];
+      //   state.totalItems = 0;
+      //   state.totalPrice = 0;
+      // });
+
+      .addCase(clearCartAPI.fulfilled, (state, action) => {
+        const removedProductId = action.meta.arg;
+
+        state.items = state.items.filter(
+          (item) =>
+            item.productId?._id !== removedProductId &&
+            item.productId !== removedProductId
+        );
+
+        state.totalItems = state.items.length;
+        state.totalPrice = state.items.reduce(
+          (sum, item) => sum + item.productId.price * item.quantity,
+          0
+        );
       });
   },
 });

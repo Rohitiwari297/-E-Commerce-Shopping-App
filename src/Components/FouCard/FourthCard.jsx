@@ -66,9 +66,9 @@ function FourthCard() {
   }
 
   return (
-    <div className="bg-[#fff6d9] py-10 px-4 md:px-10">
+    <div className="bg-[#fff6d9] ">
       {/* Title */}
-      <h2 className="text-2xl md:text-xl font-semibold text-center mb-8">
+      <h2 className="text-[20px] md:text-xl font-semibold text-center mb-3 -mt-3">
         Purchase Product
       </h2>
 
@@ -81,15 +81,17 @@ function FourthCard() {
               className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300 flex flex-col"
             >
               {/* Discount Badge */}
-              <div className="relative ml-6.5">
-                <span className="absolute top-1 -ml-5 left-1 bg-green-700 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-md">
+              <div className="relative">
+                <span className="absolute top-1  left-1 bg-green-700 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-md z-10">
                   off {item.discountPercentage}%
                 </span>
-                <img
-                  src={`${import.meta.env.VITE_BASE_URL}${item.images[0]}`} // Use the first image URL from the array of imagesitem.images[0]}
-                  alt={item.name}
-                  className="w-[500px] h-40 shadow-1xs -ml-3 items-center object-contain p-2"
-                />
+                <div className="h-35 overflow-hidden relative">
+                  <img
+                    src={`${import.meta.env.VITE_BASE_URL}${item.images[0]}`} // Use the first image URL from the array of imagesitem.images[0]}
+                    alt={item.name}
+                    className="w-full shadow-1xs  items-center object-contain  rounded-tr-md rounded-tl-md"
+                  />
+                </div>
               </div>
 
               {/* Product Info */}

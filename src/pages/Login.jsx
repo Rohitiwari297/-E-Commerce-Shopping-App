@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { sendOtp, login } from "../redux/features/auth/authSlice";
+import toast from "react-hot-toast";
 
 function Login() {
   const [mobile, setMobile] = useState("");
@@ -18,8 +19,8 @@ function Login() {
     dispatch(sendOtp(mobile))
       .unwrap()
       .then((res) => {
-        console.log(res);
-        alert("OTP sent successfully!");
+        toast.success(`OTP sent successfully! ${res.data.otp}`);
+        console.log(res.data.otp);
         setStep(2);
       })
       .catch((err) => {
@@ -35,7 +36,7 @@ function Login() {
     dispatch(login({ mobile, otp }))
       .unwrap()
       .then((res) => {
-        alert("OTP verified successfully!");
+        toast.success("Login successful!");
         navigate("/");
       })
       .catch((err) => {

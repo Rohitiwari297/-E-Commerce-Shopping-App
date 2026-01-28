@@ -11,15 +11,7 @@ import logo from "../assets/hel.png"; //  use store logo here
 
 
 import {
-  Package,
-  Clock,
-  CheckCircle2,
-  XCircle,
-  Truck,
-  AlertCircle,
   MapPin,
-  Gift,
-  Lock,
   LogOut,
   ShoppingBag,
   Settings,
