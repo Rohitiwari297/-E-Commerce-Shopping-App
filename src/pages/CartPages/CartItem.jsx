@@ -1,9 +1,11 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { clearCartAPI, fetchCartAPI, updateCartQuantityAPI } from "../../redux/features/cart/cartSlice.js";
+import { MdOutlineArrowLeft, MdOutlineSubdirectoryArrowLeft } from "react-icons/md";
 
 const CartItem = React.memo(({ item }) => {
+    const navigate = useNavigate();
     const dispatch = useDispatch();
 
     console.log("CartItem RENDER:", item);
@@ -63,14 +65,31 @@ const CartItem = React.memo(({ item }) => {
     const productId = item?.productId?._id || item?.productId;
 
     return (
-        <div className="flex gap-4 p-4 border rounded-md bg-white">
-            <img
-                src={`${import.meta.env.VITE_BASE_URL}${item?.productId?.images?.[0] || ""}`}
-                alt={item.name}
-                className="w-24 h-24 object-contain"
-            />
-            <div className="flex-1 flex flex-col justify-between">
+        <div className="flex p-4 border rounded-md bg-white gap-8">
+            <div className="flex flex-col gap-2 justify-center items-center">
                 <div>
+                    <img
+                        src={`${import.meta.env.VITE_BASE_URL}${item?.productId?.images?.[0] || ""}`}
+                        alt={item.name}
+                        className="w-24 h-24 object-contain"
+                    />
+                </div>
+                <div className="border border-gray-300 rounded w-fit">
+                    <button className="px-2 text-gray-500 text-xl" onClick={handleDecreaseQuantity}>
+                        -
+                    </button>
+                    <span className="px-2 text-gray-500 ">{item.quantity ?? 1}</span>
+                    <button className="px-2 text-gray-500 text-xl" onClick={handleIncreaseQuantity}>
+                        +
+                    </button>
+                </div>
+            </div>
+
+            <div className="flex-1 flex flex-col justify-between">
+                <div className="flex items-center justify-between">
+                    <div>
+
+                   
                     <h2 className="font-semibold">{item?.productId?.name}</h2>
                     <p className="text-sm text-gray-500">Size: {item?.productId?.size}</p>
                     <p className="text-sm text-gray-500">
@@ -85,17 +104,18 @@ const CartItem = React.memo(({ item }) => {
                     <p className="text-sm text-gray-500">
                         Delivery by {item.delivery ?? "Thu Oct 9"}
                     </p>
-                </div>
-                <div className="flex items-center gap-4 mt-2">
-                    <div className="flex items-center border rounded">
-                        <button className="px-2" onClick={handleDecreaseQuantity}>
-                            -
-                        </button>
-                        <span className="px-2">{item.quantity ?? 1}</span>
-                        <button className="px-2" onClick={handleIncreaseQuantity}>
-                            +
-                        </button>
                     </div>
+                    <div className=" h-full flex flex-col justify-between gap-10 items-center rounded">
+                        <div>
+                            <button className="text-blue-600 hover:underline -mt-32" onClick={()=> navigate(-1)} >{<MdOutlineSubdirectoryArrowLeft/>}</button>
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+                
+                <div className="flex items-center gap-4 mt-2">
+                    
                     <button
                         className="text-blue-600 hover:underline text-sm"
                         onClick={handleRemove}
@@ -110,7 +130,7 @@ const CartItem = React.memo(({ item }) => {
             {/* <Link to={"/category/itemDetails/"} state={{ List: item}}>
                 <button>View Product Details</button>
             </Link> */}
-            <button className="text-blue-600 hover:underline -mt-32" onClick={()=> {alert('working on it')}} >Go Back</button>
+           
         </div>
     );
 }, (prevProps, nextProps) => {

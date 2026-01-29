@@ -9,11 +9,10 @@ import {
   Truck,
   AlertCircle,
 } from "lucide-react";
-import DeliveryHistory from "./DeliveryHistory";
 import { useNavigate } from "react-router-dom";
 import { getOrderHistory } from "../utils/Apis";
 
-function DeliveryPage({ deliveries }) {
+function DeliveryPage() {
   const statusColor = {
     Delivered: "text-green-600 bg-green-100",
     "In Transit": "text-blue-600 bg-blue-100",

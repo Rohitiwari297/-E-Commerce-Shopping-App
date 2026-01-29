@@ -5,18 +5,11 @@ import img2 from "../assets/chal.png";
 import img3 from "../assets/namk.png";
 
 //invoice download
-import jsPDF  from "jspdf";
+import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import logo from "../assets/hel.png"; //  use store logo here
 
-
-import {
-  MapPin,
-  LogOut,
-  ShoppingBag,
-  Settings,
-  User,
-} from "lucide-react";
+import { MapPin, LogOut, ShoppingBag, Settings, User } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import DeliveryPage from "./DeliveryPage";
 import AddressModalPage from "./AddressModalPage ";
@@ -24,19 +17,6 @@ import { GiRamProfile } from "react-icons/gi";
 import Profile from "./Profile";
 import { getUserDetails } from "../redux/features/user/userSlice";
 
-
-const initialDeliveries = [
-  {
-    id: "ORD123456",
-    date: "Sep 28, 2025",
-    status: "Delivered",
-    image: img1,
-    productName: "Wireless Headphones",
-    price: 1299,
-    deliveredOn: "Oct 1, 2025",
-    trackingId: "TRK7890123",
-  },
-];
 
 const statusColor = {
   Delivered: "text-green-600 bg-green-100",
@@ -78,8 +58,7 @@ const handleInvoice = (order) => {
   //  Order Info Section
   doc.setFont("helvetica", "bold");
   doc.text("Order Details:", 120, 45);
-  doc.
-  doc.setFont("helvetica", "normal");
+  doc.doc.setFont("helvetica", "normal");
   doc.setFontSize(11);
   doc.text(`Order ID: ${order.id}`, 120, 52);
   doc.text(`Date: ${order.date}`, 120, 58);
@@ -116,10 +95,14 @@ const handleInvoice = (order) => {
   doc.line(15, finalY + 25, 195, finalY + 25);
 
   // Footer
-  doc.setFont("helvetica", "normal");  
+  doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
   doc.text("Thank you for shopping with Baniya Di Hatti!", 15, finalY + 35);
-  doc.text("For assistance, contact support@baniyadihatti.com", 15, finalY + 41);
+  doc.text(
+    "For assistance, contact support@baniyadihatti.com",
+    15,
+    finalY + 41,
+  );
   doc.text("Authorized Signature", 150, finalY + 41);
   doc.line(150, finalY + 42, 190, finalY + 42);
 
@@ -127,107 +110,130 @@ const handleInvoice = (order) => {
   doc.save(`Invoice_${order.id}.pdf`);
 };
 
-
 function DeliveryHistory() {
-  const [deliveries, setDeliveries] = useState(initialDeliveries);
+  
   const navigate = useNavigate();
 
-  // state for selected menu 
+  // state for selected menu
   const [menu, setMenu] = useState("orders");
 
-    // Get user details from store
-    const user = useSelector((state) => state.auth.user);
-    console.log('user',user)
+  // Get user details from store
+  const user = useSelector((state) => state.auth.user);
+  console.log("user", user);
 
   //for modal
-  const [selectOrder , setSelectOrder] = useState(null)
-  console.log('selectOrder', selectOrder)
+  const [selectOrder, setSelectOrder] = useState(null);
+  console.log("selectOrder", selectOrder);
 
   const handleCancelOrder = (id) => {
-    const confirmCancel = window.confirm("Are you sure you want to cancel this order?");
+    const confirmCancel = window.confirm(
+      "Are you sure you want to cancel this order?",
+    );
     if (confirmCancel) {
       setDeliveries((prev) =>
         prev.map((order) =>
-          order.id === id ? { ...order, status: "Cancelled" } : order
-        )
+          order.id === id ? { ...order, status: "Cancelled" } : order,
+        ),
       );
     }
   };
 
-
   // get user details from store
-    const dispatch = useDispatch();
-  
-    const { user: userData, loading, error } = useSelector((state) => state.user);
-  
-    useEffect(() => {
-      dispatch(getUserDetails(user._id));
-    }, [user._id]);
-  
-    console.log("user data", userData);
+  const dispatch = useDispatch();
+
+  const { user: userData, loading, error } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    dispatch(getUserDetails(user._id));
+  }, [user._id]);
+
+  console.log("user data", userData);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white border-r shadow-sm p-6">
-        <div className="text-center border-b mb-8">
-          <p className="text-sm text-gray-600 font-medium" >{userData?.name || "Rohit Tripathi"}</p>
-          <p className="text-sm text-gray-600 font-medium">+91-{userData?.mobile}</p>
+    <div className="min-h-screen bg-gray-100 flex flex-col md:flex-row">
+      {/* Sidebar / Top Menu */}
+      <aside className="bg-white md:w-64 shadow-sm md:border-r">
+        {/* User Info */}
+        <div className="p-4 md:p-6 border-b text-center">
+          <p className="text-sm font-semibold text-gray-800">
+            {userData?.name || "Rohit Tripathi"}
+          </p>
+          <p className="text-xs text-gray-500">+91-{userData?.mobile}</p>
         </div>
-        <nav className="space-y-4 text-gray-700">
-          
-          <button onClick={() => setMenu("orders")} className="flex items-center gap-3 w-full text-left hover:text-green-700">
-            <ShoppingBag size={18} /> My Orders
+
+        {/* Navigation */}
+        <nav
+          className="
+        flex md:flex-col gap-2
+        overflow-x-auto md:overflow-visible
+        p-3 md:p-4
+        text-sm text-gray-700
+      "
+        >
+          <button
+            onClick={() => setMenu("orders")}
+            className="flex items-center gap-2 px-4 py-2 rounded-full md:rounded-lg
+                     bg-gray-100 hover:bg-green-100 hover:text-green-700 whitespace-nowrap"
+          >
+            <ShoppingBag size={16} /> Orders
           </button>
-          <button onClick={() => setMenu("address")} className="flex items-center gap-3 w-full text-left hover:text-green-700">
-            <MapPin size={18} /> Addresses
+
+          <button
+            onClick={() => setMenu("address")}
+            className="flex items-center gap-2 px-4 py-2 rounded-full md:rounded-lg
+                     bg-gray-100 hover:bg-green-100 hover:text-green-700 whitespace-nowrap"
+          >
+            <MapPin size={16} /> Address
           </button>
-          <button onClick={() => setMenu("profile")} className="flex items-center gap-3 w-full text-left hover:text-green-700">
-            <User size={18} /> Profile
+
+          <button
+            onClick={() => setMenu("profile")}
+            className="flex items-center gap-2 px-4 py-2 rounded-full md:rounded-lg
+                     bg-gray-100 hover:bg-green-100 hover:text-green-700 whitespace-nowrap"
+          >
+            <User size={16} /> Profile
           </button>
-          <button onClick={() => setMenu("settings")} className="flex items-center gap-3 w-full text-left hover:text-green-700">
-            <Settings size={18} /> Setting
+
+          <button
+            onClick={() => setMenu("settings")}
+            className="flex items-center gap-2 px-4 py-2 rounded-full md:rounded-lg
+                     bg-gray-100 hover:bg-green-100 hover:text-green-700 whitespace-nowrap"
+          >
+            <Settings size={16} /> Settings
           </button>
-          
-          <button className="flex items-center gap-3 w-full text-left text-red-600 hover:text-red-700 mt-6">
-            <LogOut size={18} /> Logout
+
+          <button
+            className="flex items-center gap-2 px-4 py-2 rounded-full md:rounded-lg
+                     text-red-600 bg-red-50 hover:bg-red-100 whitespace-nowrap md:mt-6"
+          >
+            <LogOut size={16} /> Logout
           </button>
         </nav>
       </aside>
 
       {/* Main Content */}
-    
-        <main className="flex-1 py-10 px-4 lg:px-12">
-          {menu === "orders" && (
-          <DeliveryPage deliveries={deliveries} />
-        )}
+      <main className="flex-1 p-4 md:p-8 lg:p-10">
+        <div className="bg-white rounded-xl shadow-sm p-4 md:p-6">
+          {menu === "orders" && <DeliveryPage  />}
 
-        {menu === "address" && (
-          <div>
-            <h2 className="text-xl font-semibold mb-4">My Addresses</h2>
-            {/* You can replace this with AddressPage component */}
-            {/* <p>Address page content here...</p> */}
-            <AddressModalPage />
-          </div>
-        )}
+          {menu === "address" && (
+            <div>
+              <h2 className="text-lg font-semibold mb-4">My Addresses</h2>
+              <AddressModalPage />
+            </div>
+          )}
 
-        {menu === "settings" && (
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Settings</h2>
-            <p>Settings content here...</p>
-          </div>
-        )}
-        {menu === "profile" && (
-          <div>
-            
-              <Profile />
-          </div>
-        )}
-        </main>
-      
+          {menu === "settings" && (
+            <div>
+              <h2 className="text-lg font-semibold mb-4">Settings</h2>
+              <p>Settings content here...</p>
+            </div>
+          )}
+
+          {menu === "profile" && <Profile />}
+        </div>
+      </main>
     </div>
-
-  
   );
 }
 

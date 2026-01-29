@@ -3,19 +3,17 @@ import { IoMdClose, IoMdSearch } from "react-icons/io";
 import { TbCategory } from "react-icons/tb";
 import { FaRegUser } from "react-icons/fa";
 import { IoCartOutline } from "react-icons/io5";
-import { GiHamburgerMenu } from "react-icons/gi";
 import { IoIosArrowDown } from "react-icons/io";
 import img from "../../../public/hel.png";
 import { Link, useNavigate } from "react-router-dom";
 
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import Badge from "@mui/material/Badge";
 import { useSelector, useDispatch } from "react-redux";
 import Location from "../../helper/Location";
 import { getCategories } from "../../utils/Apis";
 import { getCat } from "../../redux/features/category/categotySlice";
-import { CropIcon, CrossIcon, User, User2, UserCircle, UserCircle2, UserMinus } from "lucide-react";
+import { UserCircle2 } from "lucide-react";
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -269,7 +267,7 @@ function Header() {
 
     {/* ================= MOBILE MENU ================= */}
     {menuOpen && (
-      <div className="md:hidden bg-white border-t shadow-lg">
+      <div className="md:hidden bg-white border-t shadow-lg absolute top-30 right-2 w-1/2">
 
         <div className="px-4 py-3">
           {userSession ? (
