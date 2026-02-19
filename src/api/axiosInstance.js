@@ -1,8 +1,8 @@
 import axios from "axios";
-export const BaseURI = "`https://multigrocery.quickreachindia.com/";
+export const BaseURI = "`https://ecommerce.suryapolypack.com/";
 
 const axiosInstance = axios.create({
-  baseURL: "https://multigrocery.quickreachindia.com/",
+  baseURL: "https://ecommerce.suryapolypack.com/",
   headers: {
     "Content-Type": "application/json",
   },

@@ -239,6 +239,7 @@ const cartSlice = createSlice({
       })
       .addCase(addToCartAPI.fulfilled, (state, action) => {
         state.loading = false;
+        console.log("Cart API Response:", action.payload);
         // Merge logic: Preserve populated productId if available OR use passed details
         const newItems = action.payload.data.items;
         const sentDetails = action.meta.arg.productDetails; // Access passed full details
@@ -247,7 +248,7 @@ const cartSlice = createSlice({
           const newItemId = newItem.productId._id || newItem.productId;
 
           // 1. Try to find existing populated item
-          const existingItem = state.items.find((old) => {
+          const existingItem = state.items?.find((old) => {
             const oldId = old.productId._id || old.productId;
             return oldId === newItemId;
           });
@@ -296,13 +297,25 @@ const cartSlice = createSlice({
       })
 
       /* FETCH */
+      // .addCase(fetchCartAPI.fulfilled, (state, action) => {
+      //   const cart = action.payload.data;
+      //   console.log("CART API RESPONSE FETCH 👉", action.payload.data.items);
+      //   state.totalItems = cart.totalItems;
+      //   state.totalPrice = cart.totalPrice;
+      //   state.items = action.payload.data.items
+      // })
+
       .addCase(fetchCartAPI.fulfilled, (state, action) => {
-        const cart = action.payload.data;
-        //console.log("CART API RESPONSE 👉", action.payload.data.items);
-        state.totalItems = cart.totalItems;
-        state.totalPrice = cart.totalPrice;
-        state.items = action.payload.data.items
-      })
+  console.log("FULL FETCH PAYLOAD 👉", action.payload);
+
+  const cart = action.payload.data?.cart;
+  const summary = action.payload.data?.priceSummary;
+
+  state.items = cart?.items || [];
+  state.totalItems = summary?.totalItems || 0;
+  state.totalPrice = summary?.totalPrice || 0;
+})
+
 
       // /* CLEAR */
       // .addCase(clearCartAPI.fulfilled, (state) => {

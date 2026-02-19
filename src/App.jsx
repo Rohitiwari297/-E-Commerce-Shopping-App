@@ -30,6 +30,7 @@ function App() {
   const dispatch = useDispatch();
   useEffect(() => {
     if (!user) return;
+    // console.log('fetching cart');
     dispatch(fetchCartAPI());
   }, [user]);
 

@@ -1,5 +1,6 @@
 import toast from "react-hot-toast";
 import axiosInstance from "../api/axiosInstance";
+import axios from "axios";
 
 export const getCategories = async ({setCategoryDetails}) => {
     
@@ -20,8 +21,9 @@ export const getCategories = async ({setCategoryDetails}) => {
 
 export const getBanners = async (setBannersData) => {
     try {
-        const res = await axiosInstance.get("/api/banners");
-        setBannersData(res.data.data);
+        const res = await axios.get(`https://ecommerce.suryapolypack.com/api/banners`);
+        console.log('banner_respinse:', res.data?.data)
+        setBannersData(res.data?.data);
     } catch (error) {
         console.log(error);
         return null;

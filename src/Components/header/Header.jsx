@@ -91,20 +91,20 @@ function Header() {
   //console.log('categoryDetailsrrrrr',categoryData);
 
   return (
-  <div className="sticky top-0 z-50 bg-white shadow">
-    <div className="max-w-7xl mx-auto px-1">
+  <div className="sticky top-0 z-50 bg-white shadow-md border-b border-gray-200">
+    <div className="w-full px-4 md:px-6 lg:px-8">
       {/* ================= HEADER ================= */}
-      <header className="flex items-center justify-between h-16 px-5">
+      <header className="flex items-center justify-between h-16 px-5 md:h-20 lg:h-24">
 
         {/* LOGO */}
         <div
           onClick={() => navigate("/")}
-          className="flex items-center cursor-pointer"
+          className="flex items-center cursor-pointer hover:opacity-80 transition "
         >
           <img
             src={img}
             alt="logo"
-            className="h-10 w-auto object-contain"
+            className="h-10 md:h-12 lg:h-20 w-auto object-contain"
           />
         </div>
 
@@ -118,71 +118,49 @@ function Header() {
           <input
             type="text"
             placeholder="Search for products..."
-            className="w-full h-10 px-3 border rounded-l-md text-sm focus:ring-2 focus:ring-green-600 outline-none"
+            className="w-full h-10 px-3 border border-gray-300 rounded-l-md text-sm focus:ring-2 focus:ring-green-600 focus:border-transparent outline-none transition"
           />
-          <button className="w-12 bg-green-600 text-white rounded-r-md flex items-center justify-center hover:bg-green-700">
+          <button className="w-12 bg-green-600 text-white rounded-r-md flex items-center justify-center hover:bg-green-700 transition">
             <IoMdSearch size={20} />
           </button>
         </div>
 
         {/* DESKTOP RIGHT MENU */}
-        <div className="hidden md:flex items-center gap-6 text-sm font-medium">
-
-          {/* CATEGORIES */}
-          <div ref={categoriesRef} className="relative">
-            <button
-              onClick={() => setCategoriesOpen(!categoriesOpen)}
-              className="flex items-center gap-1 hover:text-green-600"
-            >
-              <TbCategory size={18} />
-              Categories
-              <IoIosArrowDown size={14} />
-            </button>
-
-            {categoriesOpen && (
-              <div className="absolute top-10 left-0 w-52 bg-white border rounded-lg shadow-lg p-2 z-50">
-                <ul className="max-h-60 overflow-y-auto">
-                  {categoryDetails.map((cat) => (
-                    <Link
-                      key={cat._id}
-                      to="/category"
-                      onClick={() => setCategoriesOpen(false)}
-                    >
-                      <li className="px-3 py-2 text-sm hover:bg-green-50 rounded">
-                        {cat.name}
-                      </li>
-                    </Link>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
+        <div className="hidden md:flex items-center gap-8 text-sm font-medium">
 
           {/* ACCOUNT */}
           {userSession ? (
             <Menu as="div" className="relative">
-              <MenuButton className="flex items-center gap-1 hover:text-green-600">
+              <MenuButton className="flex items-center gap-2 text-gray-700 hover:text-green-600 transition">
                 <FaRegUser size={18} />
                 Account
                 <IoIosArrowDown size={14} />
               </MenuButton>
 
-              <MenuItems className="absolute top-10 left-0 w-48 bg-white border rounded-lg shadow-lg p-2">
+              <MenuItems className="absolute top-10 left-0 w-48 bg-white border border-gray-200 rounded-lg shadow-lg p-2">
                 <div className="px-3 py-2 text-xs text-gray-500 border-b">
                   {user.mobile}
                 </div>
                 <MenuItem>
                   <button
                     onClick={() => navigate("/delivery/history")}
-                    className="w-full text-left px-3 py-2 hover:bg-green-50 text-sm"
+                    className="w-full text-left px-3 py-2 hover:bg-green-50 text-sm rounded transition"
                   >
-                    Orders
+                    My Orders
+                  </button>
+                </MenuItem>
+                <MenuItem>
+                  <button
+                    onClick={() => navigate("/Profile")}
+                    className="w-full text-left px-3 py-2 hover:bg-green-50 text-sm rounded transition"
+                  >
+                    My Profile
                   </button>
                 </MenuItem>
                 <MenuItem>
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 text-sm"
+                    className="w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 text-sm rounded transition"
                   >
                     Logout
                   </button>
@@ -190,7 +168,7 @@ function Header() {
               </MenuItems>
             </Menu>
           ) : (
-            <Link to="/Login" className="flex items-center gap-1 hover:text-green-600">
+            <Link to="/Login" className="text-gray-700 hover:text-green-600 transition flex items-center gap-2">
               <FaRegUser size={18} />
               Login
             </Link>
@@ -198,13 +176,13 @@ function Header() {
 
           {/* CART */}
           <Menu as="div" className="relative">
-            <MenuButton className="flex items-center gap-1 hover:text-green-600">
-              <Badge badgeContent={items?.length ?? 0} color="primary">
+            <MenuButton className="flex items-center gap-1 text-gray-700 hover:text-green-600 transition">
+              <Badge badgeContent={items?.length ?? 0} color="error">
                 <IoCartOutline size={22} />
               </Badge>
             </MenuButton>
 
-            <MenuItems className="absolute right-0 top-10 w-80 bg-gray-900 text-white rounded-lg shadow-lg p-2">
+            <MenuItems className="absolute right-0 top-10 w-80 bg-white border border-gray-200 rounded-lg shadow-lg p-3">
               {items.length === 0 ? (
                 <p className="text-center text-sm py-6 text-gray-400">
                   Cart is empty
@@ -213,15 +191,15 @@ function Header() {
                 <>
                   <div className="max-h-60 overflow-y-auto">
                     {items.map((ele, idx) => (
-                      <div key={idx} className="flex items-center gap-3 px-3 py-2">
+                      <div key={idx} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 rounded transition">
                         <img
                           src={`${import.meta.env.VITE_BASE_URL}${ele.productId?.images?.[0]}`}
-                          className="h-10 w-10 object-contain bg-white rounded"
+                          className="h-10 w-10 object-contain bg-gray-100 rounded"
                         />
-                        <div className="flex-1 text-xs">
+                        <div className="flex-1 text-xs text-gray-700">
                           {ele.productId?.name}
                         </div>
-                        <span className="text-green-400 text-sm">
+                        <span className="text-green-600 text-sm font-semibold">
                           ₹{ele.price}
                         </span>
                       </div>
@@ -229,7 +207,7 @@ function Header() {
                   </div>
 
                   <Link to="/cartPage">
-                    <button className="w-full mt-2 py-2 bg-green-600 rounded text-sm hover:bg-green-700">
+                    <button className="w-full mt-3 py-2 bg-green-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700 transition">
                       View Cart
                     </button>
                   </Link>
@@ -242,7 +220,7 @@ function Header() {
         {/* MOBILE ICONS */}
         <div className="md:hidden flex items-center gap-4">
           <Link to="/cartPage">
-            <Badge badgeContent={items?.length ?? 0} color="primary">
+            <Badge badgeContent={items?.length ?? 0} color="error">
               <IoCartOutline size={26} />
             </Badge>
           </Link>
@@ -253,13 +231,13 @@ function Header() {
       </header>
 
       {/* MOBILE SEARCH */}
-      <div className="md:hidden flex gap-2 pb-3">
+      <div className="md:hidden flex gap-2 pb-3 px-5">
         <input
           type="text"
           placeholder="Search products..."
-          className="flex-1 h-10 border rounded-md px-3 text-sm"
+          className="flex-1 h-10 border border-gray-300 rounded-md px-3 text-sm focus:ring-2 focus:ring-green-600 outline-none"
         />
-        <button className="h-10 w-10 bg-green-600 text-white rounded-md flex items-center justify-center">
+        <button className="h-10 w-10 bg-green-600 text-white rounded-md flex items-center justify-center hover:bg-green-700 transition">
           <IoMdSearch size={18} />
         </button>
       </div>
@@ -267,33 +245,26 @@ function Header() {
 
     {/* ================= MOBILE MENU ================= */}
     {menuOpen && (
-      <div className="md:hidden bg-white border-t shadow-lg absolute top-30 right-2 w-1/2">
+      <div className="md:hidden bg-white border-t border-gray-200 shadow-lg absolute top-30 right-2 w-1/2 rounded-lg">
 
         <div className="px-4 py-3">
           {userSession ? (
             <>
               <button
                 onClick={() => {navigate("/delivery/history"); setMenuOpen(false);}}
-                className="block w-full text-left text-[20px] py-2"
+                className="block w-full text-left text-[16px] py-2 text-gray-700 hover:text-green-600 transition"
               >
-
                 My Orders
               </button>
               <button
-                onClick={() => {navigate("/delivery/history"); setMenuOpen(false);}}
-                className="block w-full text-left text-[20px] py-2"
+                onClick={() => {navigate("/Profile"); setMenuOpen(false);}}
+                className="block w-full text-left text-[16px] py-2 text-gray-700 hover:text-green-600 transition"
               >
                 My Profile
               </button>
               <button
-                onClick={() => {navigate("/delivery/history"); setMenuOpen(false);}}
-                className="block w-full text-left text-[20px] py-2"
-              >
-                My Addresses
-              </button>
-              <button
                 onClick={handleLogout}
-                className="block w-full text-left text-[20px] py-2 text-red-600"
+                className="block w-full text-left text-[16px] py-2 text-red-600 hover:text-red-700 transition"
               >
                 Logout
               </button>
@@ -301,7 +272,7 @@ function Header() {
           ) : (
             <Link
               to="/Login"
-              className="block text-sm py-2"
+              className="block text-[16px] py-2 text-gray-700 hover:text-green-600 transition"
               onClick={() => setMenuOpen(false)}
             >
               Login
@@ -310,9 +281,9 @@ function Header() {
         </div>
         <button 
           onClick={() => setMenuOpen(false)}
-          className=" flex w-full justify-center px-3 py-2 rounded-xl items-center bg-green-200 hover:bg-green-50 text-[20px] text-center text-white"
+          className="flex w-full justify-center px-3 py-2 rounded-lg items-center bg-gray-100 hover:bg-gray-200 text-gray-600 transition"
         >
-          <IoMdClose  className="text-gray-600" size={24}/>
+          <IoMdClose size={24}/>
         </button>
       </div>
     )}
