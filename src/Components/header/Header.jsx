@@ -14,11 +14,17 @@ import Location from "../../helper/Location";
 import { getCategories } from "../../utils/Apis";
 import { getCat } from "../../redux/features/category/categotySlice";
 import { UserCircle2 } from "lucide-react";
+import CartDrawer from "../CartDrawer/CartDrawer";
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [userSession, setUserSession] = useState(null);
+
+  //DRAWER
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const openCart = () => setIsCartOpen(true);
+  const closeCart = () => setIsCartOpen(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -176,14 +182,16 @@ function Header() {
 
           {/* CART */}
           <Menu as="div" className="relative">
-            <MenuButton className="flex items-center gap-1 text-gray-700 hover:text-green-600 transition">
+            <MenuButton onClick={openCart} className="flex items-center gap-1 text-gray-700 hover:text-green-600 transition">
+              
               <Badge badgeContent={items?.length ?? 0} color="error">
                 <IoCartOutline size={22} />
               </Badge>
             </MenuButton>
 
-            <MenuItems className="absolute right-0 top-10 w-80 bg-white border border-gray-200 rounded-lg shadow-lg p-3">
+            {/* <MenuItems className="absolute right-0 top-10 w-80 bg-white border border-gray-200 rounded-lg shadow-lg p-3">
               {items.length === 0 ? (
+                
                 <p className="text-center text-sm py-6 text-gray-400">
                   Cart is empty
                 </p>
@@ -213,7 +221,8 @@ function Header() {
                   </Link>
                 </>
               )}
-            </MenuItems>
+            </MenuItems> */}
+            <CartDrawer  open={isCartOpen} onClose={closeCart} data={items} />
           </Menu>
         </div>
 
