@@ -4,7 +4,7 @@ import { TbCategory } from "react-icons/tb";
 import { FaRegUser } from "react-icons/fa";
 import { IoCartOutline } from "react-icons/io5";
 import { IoIosArrowDown } from "react-icons/io";
-import img from "../../../public/hel.png";
+import logo from "../../assets/tazaCartLogo.png";
 import { Link, useNavigate } from "react-router-dom";
 
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
@@ -102,9 +102,9 @@ function Header() {
           className="flex items-center cursor-pointer hover:opacity-80 transition "
         >
           <img
-            src={img}
+            src={logo}
             alt="logo"
-            className="h-10 md:h-12 lg:h-20 w-auto object-contain"
+            className="h-10 md:h-12 lg:h-28 w-auto object-contain"
           />
         </div>
 

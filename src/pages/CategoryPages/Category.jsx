@@ -1,11 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { fetchCartAPI } from '../../redux/features/cart/cartSlice';
 import CategoryProduct from './CategoryProduct';
 import { getProductDetsils } from '../../redux/features/product/productSlice';
+import { getSubCategories } from '../../utils/Apis';
 
 function Category() {
+  const [subCategory, setSubCategory] = useState([]);
+  const [selectedSubCatId, setSelectedSubCatId] = useState(null);
   const dispatch = useDispatch();
 
   const location = useLocation();
@@ -19,13 +22,39 @@ function Category() {
   console.log('prodData', prodData);
 
   /* =========================
-     FETCH PRODUCTS BY CATEGORY
+     API CALL TOFETCH SUB CATEGORIES BY CATEGORY ID
   ========================== */
   useEffect(() => {
     if (catId) {
-      dispatch(getProductDetsils(catId));
+      getSubCategories(catId)
+        .then((data) => {
+          setSubCategory(data);
+          // Load saved subcategory from localStorage
+          const savedSubCatId = localStorage.getItem(`selectedSubCat_${catId}`);
+          if (savedSubCatId && data.some((cat) => cat._id === savedSubCatId)) {
+            setSelectedSubCatId(savedSubCatId);
+          } else if (data.length > 0) {
+            // If no saved selection, select first one
+            setSelectedSubCatId(data[0]._id);
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching subcategories:', error);
+          setSubCategory([]);
+        });
     }
-  }, [catId, dispatch]);
+  }, [catId]);
+
+  console.log('subCategory', subCategory);
+
+  /* =========================
+     FETCH PRODUCTS BY CATEGORY
+  ========================== */
+  useEffect(() => {
+    if (catId && selectedSubCatId) {
+      dispatch(getProductDetsils(selectedSubCatId));
+    }
+  }, [catId, dispatch, selectedSubCatId]);
 
   /* =========================
      FETCH CART ONLY ONCE
@@ -38,13 +67,21 @@ function Category() {
      FILTER PRODUCTS
   ========================== */
   const filterProducts = (id) => {
-    if (id) {
-      dispatch(getProductDetsils(id));
-    }
+    setSelectedSubCatId(id);
+    localStorage.setItem(`selectedSubCat_${catId}`, id);
+    dispatch(getProductDetsils(id));
   };
 
-  if (!catData) {
-    return <div>Loading...</div>;
+  if (!subCategory?.length) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center">
+          <div className="text-6xl mb-4">📦</div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">No Categories Found</h2>
+          <p className="text-gray-600">This category doesn't have any subcategories available yet.</p>
+        </div>
+      </div>
+    );
   }
 
   console.log('catData', catData);
@@ -70,14 +107,14 @@ function Category() {
         md:max-h-[calc(100vh-40px)]
       "
         >
-          {catData.map((cat) => (
+          {subCategory.map((cat) => (
             <li
               onClick={() => filterProducts(cat._id)}
               key={cat._id}
-              className="
+              className={`
               min-w-[80px]
               md:min-w-[50px]
-              border
+              border-2
               rounded-lg
               shadow
               hover:scale-105
@@ -88,10 +125,17 @@ function Category() {
               items-center
               cursor-pointer
               md:m-2
-            "
+              ${selectedSubCatId === cat._id ? 'border-green-600 bg-green-50' : 'border-gray-300 bg-white'}
+            `}
             >
               <img src={`${import.meta.env.VITE_BASE_URL}${cat.image}`} alt={cat.name} className="w-12 h-12 object-contain mb-1" />
-              <p className="text-[10px] sm:text-xs text-black font-medium text-center">{cat.name}</p>
+              <p
+                className={`text-[10px] sm:text-xs font-medium text-center ${
+                  selectedSubCatId === cat._id ? 'text-green-600' : 'text-black'
+                }`}
+              >
+                {cat.name}
+              </p>
             </li>
           ))}
         </ul>
@@ -103,11 +147,21 @@ function Category() {
           <h3 className="text-xl text-white">Details of Selected Products</h3>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-3 sm:p-4">
-          {prodData.map((cat) => (
-            <CategoryProduct key={cat._id} cat={cat} />
-          ))}
-        </div>
+        {prodData?.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-3 sm:p-4">
+            {prodData.map((product) => (
+              <CategoryProduct key={product._id} cat={product} />
+            ))}
+          </div>
+        ) : (
+          <div className="flex items-center justify-center h-96">
+            <div className="text-center">
+              <div className="text-6xl mb-4">🛒</div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">No Products Available</h2>
+              <p className="text-gray-600">We couldn't find any products in this category.</p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

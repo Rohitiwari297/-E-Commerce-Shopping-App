@@ -18,7 +18,7 @@ function SecCard() {
 
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 md:gap-4 lg:gap-6">
           {cateData.map((cat) => (
-            <Link key={cat._id} to="/category" state={{ catId: cat._id,  }} className="group">
+            <Link key={cat._id} to={`/category`} state={{ catId: cat._id }} className="group">
               <div className="flex flex-col items-center justify-center">
                 <div
                   className="w-full aspect-square bg-gradient-to-br from-[#f3f9fb] to-[#e8f5f7] rounded-2xl

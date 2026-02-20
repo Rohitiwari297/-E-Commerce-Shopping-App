@@ -7,12 +7,14 @@ import axiosInstance from "../../../api/axiosInstance";
 export const getProductDetsils = createAsyncThunk(
     "product/Details",
     // async function
-    async (id , thunkAPI) => {
+    async (id, thunkAPI) => {
+        console.log('getproductmecatId:', id)
         try {
-            if(id){
-                const response = await axiosInstance.get(`/api/products?category=${id}&limit=20`)
+            if (id) {
+                const response = await axiosInstance.get(`/api/products?subCategory=${id}`)
+                console.log('productBySubCat:', response)
                 return response.data.data;  // backend se jo data aa raha hai
-            }else {
+            } else {
                 const response = await axiosInstance.get(`/api/products?limit=24`)
                 return response.data.data;  // backend se jo data aa raha hai
             }
@@ -20,45 +22,48 @@ export const getProductDetsils = createAsyncThunk(
             return thunkAPI.rejectWithValue(error.response.data)
         }
     }
-    
+
 )
+
+// export const getSub
 
 
 /**  
  * WRITE SLICER FUNCTION 
  * */
-    //Initial State
-    const initialState = {
-        prodDetails: null,
-        loading: false,
-        error: null
-    }
+//Initial State
+const initialState = {
+    prodDetails: null,
+    loading: false,
+    error: null
+}
 
-    // create slicer
-    const productSlicer = createSlice({
-        name: "prodList",
-        initialState,
-        reducers: {
-            getList: (state, action) => {
-                state.prodList = action.payload;
-                console.log('product List from store', action.payload)
-            }
-        },
-        extraReducers: (builder) => {
-            builder
-                .addCase(getProductDetsils.pending, (state) => {
-                    state.loading = true
-                })
-                .addCase(getProductDetsils.fulfilled, (state, action) => {
-                    state.loading = false
-                    state.prodDetails = action.payload
-                })
-                .addCase(getProductDetsils.rejected, (state, action) => {
-                    state.loading = false
-                    state.prodDetails = action.payload
-                })
+// create slicer
+const productSlicer = createSlice({
+    name: "prodList",
+    initialState,
+    reducers: {
+        getList: (state, action) => {
+            state.prodList = action.payload;
+            console.log('product List from store', action.payload)
         }
-    })
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(getProductDetsils.pending, (state) => {
+                state.loading = true
+            })
+            .addCase(getProductDetsils.fulfilled, (state, action) => {
+                state.loading = false
+                console.log('getPorductDetails:', action.payload)
+                state.prodDetails = action.payload
+            })
+            .addCase(getProductDetsils.rejected, (state, action) => {
+                state.loading = false
+                state.prodDetails = action.payload
+            })
+    }
+})
 
-    export const {getList} = productSlicer.actions;
-    export default productSlicer.reducer
+export const { getList } = productSlicer.actions;
+export default productSlicer.reducer

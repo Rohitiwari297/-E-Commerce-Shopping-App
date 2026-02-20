@@ -2,18 +2,34 @@ import toast from "react-hot-toast";
 import axiosInstance from "../api/axiosInstance";
 import axios from "axios";
 
-export const getCategories = async ({setCategoryDetails}) => {
-    
+export const getCategories = async ({ setCategoryDetails }) => {
+
     try {
         const response = await axiosInstance.get("/api/categories");
         return setCategoryDetails(response.data.data);
-        
+
     } catch (error) {
         console.log(error);
         return null;
     }
 
 }
+
+/**
+ * get Banners api
+ */
+export const getSubCategories = async (catId) => {
+    try {
+        const response = await axiosInstance.get(
+            `/api/categories/sub?category=${catId}`
+        );
+        return response.data?.data?.[0]?.subCategories;
+    } catch (error) {
+        console.log(error);
+        return [];
+    }
+};
+
 
 /**
  * get Banners api
@@ -39,7 +55,7 @@ export const saveAddress = async (data) => {
         const res = await axiosInstance.post(`/api/users/address`, data);
         toast.success(res.data.message)
         console.log(res.data)
-        
+
     } catch (error) {
         console.log(error);
         return null;
@@ -51,7 +67,7 @@ export const getAddress = async (setAllAddress) => {
         const res = await axiosInstance.get(`/api/users/address`);
         toast.success(res.data.message)
         setAllAddress(res.data.data)
-        
+
     } catch (error) {
         console.log(error);
         return null;
@@ -61,13 +77,13 @@ export const getAddress = async (setAllAddress) => {
 
 export const placeOrder = async (address, paymentMethod) => {
     try {
-        const res = await axiosInstance.post(`/api/orders/place`,{
+        const res = await axiosInstance.post(`/api/orders/place`, {
             paymentMethod: paymentMethod,
             shippingAddress: address
         });
         toast.success(res.data.message)
         console.log(res.data)
-        return 
+        return
 
     } catch (error) {
         console.log(error);

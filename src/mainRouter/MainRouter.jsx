@@ -12,12 +12,12 @@ function MainRouter() {
       </section>
 
       {/* ================= PRODUCT CAROUSEL ================= */}
-      <section className="max-w-7xl my-14 px-3 sm:px-6 ">
+      <section className="max-w-7xl mt-7 px-3 sm:px-6 ">
         <ProductCarousel img="/caur.png" />
       </section>
 
       {/* ================= CATEGORY SECTION ================= */}
-      <section className=" my-14 px-3 sm:px-6 ">
+      <section className="  px-3 sm:px-6 ">
         <SecCard />
       </section>
 

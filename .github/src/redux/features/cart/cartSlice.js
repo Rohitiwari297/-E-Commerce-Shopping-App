@@ -1,0 +1,345 @@
+
+/** 
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
+
+// use createAsyncThunk function 
+export const addToCartAPI = createAsyncThunk(
+  "cart/addToCart",
+  async (prod_id, {rejectWithValue}) => {
+    try {
+      const res = axios
+                    .post(`${import.meta.env.VITE_BASE_URL}api/cart/add`, {prod_id})
+                    .then((res) => {
+                      console.log(res.data)
+                      return res.data
+                    })
+      
+    } catch (error) {
+      return rejectWithValue(error.message)
+    }
+  }
+)
+
+const cartSlice = createSlice({
+  name: "cart",
+  initialState: {
+    items: [], // {id, name, price, qty, image}
+    totalItems: 0,
+    totalPrice: 0,
+  },
+
+  reducers: {
+    addToCart: (state, action) => {
+      const item = action.payload;
+      const existing = state.items.find((p) => p.id === item.id);
+      console.log('state:', state)
+      console.log('action.payload:', item)
+
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        state.items.push({ ...item, qty: 1 });
+      }
+
+      state.totalItems += 1;
+      state.totalPrice += item.price;
+    },
+
+    removeFromCart: (state, action) => {
+      const id = action.payload;
+      const existing = state.items.find((p) => p.id === id);
+
+      if (!existing) return;
+
+      state.totalItems -= existing.qty;
+      state.totalPrice -= existing.price * existing.qty;
+
+      state.items = state.items.filter((p) => p.id !== id);
+    },
+
+    increaseQty: (state, action) => {
+      const id = action.payload;
+      const item = state.items.find((p) => p.id === id);
+
+      if (item) {
+        item.qty += 1;
+        state.totalItems += 1;
+        state.totalPrice += item.price;
+      }
+    },
+
+    decreaseQty: (state, action) => {
+      const id = action.payload;
+      const item = state.items.find((p) => p.id === id);
+
+      if (item && item.qty > 1) {
+        item.qty -= 1;
+        state.totalItems -= 1;
+        state.totalPrice -= item.price;
+      } else {
+        // removes item if qty becomes 0
+        state.items = state.items.filter((p) => p.id !== id);
+        state.totalItems -= 1;
+        state.totalPrice -= item.price;
+      }
+    },
+
+    clearCart: (state) => {
+      state.items = [];
+      state.totalItems = 0;
+      state.totalPrice = 0;
+    }
+  }
+});
+
+export const {
+  addToCart,
+  removeFromCart,
+  increaseQty,
+  decreaseQty,
+  clearCart,
+} = cartSlice.actions;
+
+export default cartSlice.reducer;
+
+*/
+
+
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
+
+/* ================= ADD TO CART ================= */
+export const addToCartAPI = createAsyncThunk(
+  "cart/add",
+  async ({ productId, quantity }, { rejectWithValue }) => {
+    try {
+
+      const token = localStorage.getItem("token")
+      const res = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}api/cart/add`,
+        {
+          productId,
+          quantity
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+/* ================= REMOVE FROM CART QUANTITY ================= */
+export const updateCartQuantityAPI = createAsyncThunk(
+  "cart/update",
+  async ({ productId, quantity }, { rejectWithValue }) => {
+    console.log('productId:', productId, "quantity:", quantity)
+    try {
+      const token = localStorage.getItem("token")
+      const res = await axios.patch(
+        `${import.meta.env.VITE_BASE_URL}api/cart/update`,
+        {
+          productId,
+          quantity: String(quantity)
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  },
+
+);
+
+/* ================= FETCH CART (on refresh) ================= */
+export const fetchCartAPI = createAsyncThunk(
+  "cart/fetch",
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token")
+      const res = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}api/cart`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+/* ================= CLEAR CART ================= */
+export const clearCartAPI = createAsyncThunk(
+  "cart/clear",
+  async (id, { rejectWithValue }) => {
+    console.log("idddd:", id)
+    try {
+      const token = localStorage.getItem("token")
+      if (id){
+        const res = await axios.delete(
+          `${import.meta.env.VITE_BASE_URL}api/cart/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+        return res.data;
+      }else{
+        const res = await axios.delete(
+          `${import.meta.env.VITE_BASE_URL}/api/cart`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+        return res.data;
+      }
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+/* ================= SLICE ================= */
+const cartSlice = createSlice({
+  name: "cart",
+  initialState: {
+    items: [],
+    totalItems: 0,
+    totalPrice: 0,
+    loading: false,
+    error: null,
+  },
+
+  reducers: {},
+
+  extraReducers: (builder) => {
+    builder
+
+      /* ADD */
+      .addCase(addToCartAPI.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(addToCartAPI.fulfilled, (state, action) => {
+        state.loading = false;
+        console.log("Cart API Response:", action.payload);
+        // Merge logic: Preserve populated productId if available OR use passed details
+        const newItems = action.payload.data.items;
+        const sentDetails = action.meta.arg.productDetails; // Access passed full details
+
+        state.items = newItems.map((newItem) => {
+          const newItemId = newItem.productId._id || newItem.productId;
+
+          // 1. Try to find existing populated item
+          const existingItem = state.items?.find((old) => {
+            const oldId = old.productId._id || old.productId;
+            return oldId === newItemId;
+          });
+
+          if (existingItem && typeof existingItem.productId === 'object') {
+            return { ...newItem, productId: existingItem.productId };
+          }
+
+          // 2. If new item and we have sentDetails, use them!
+          if (sentDetails && sentDetails._id === newItemId) {
+            return { ...newItem, productId: sentDetails };
+          }
+
+          return newItem;
+        });
+
+        console.log("CART ITEMS MERGED (ADD) 👉", state.items);
+        state.totalItems = action.payload.data.totalItems;
+        state.totalPrice = action.payload.data.totalPrice;
+      })
+      .addCase(addToCartAPI.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      /* UPDATE */
+      .addCase(updateCartQuantityAPI.fulfilled, (state, action) => {
+        // Merge logic: Preserve populated productId if available
+        const newItems = action.payload.data.items;
+        state.items = newItems.map((newItem) => {
+          const newItemId = newItem.productId._id || newItem.productId;
+          const existingItem = state.items.find((old) => {
+            const oldId = old.productId._id || old.productId;
+            return oldId === newItemId;
+          });
+
+          if (existingItem && typeof existingItem.productId === 'object') {
+            return { ...newItem, productId: existingItem.productId };
+          }
+          return newItem;
+        });
+
+        console.log("CART ITEMS MERGED (UPDATE) 👉", state.items);
+        state.totalItems = action.payload.data.totalItems;
+        state.totalPrice = action.payload.data.totalPrice;
+      })
+
+      /* FETCH */
+      // .addCase(fetchCartAPI.fulfilled, (state, action) => {
+      //   const cart = action.payload.data;
+      //   console.log("CART API RESPONSE FETCH 👉", action.payload.data.items);
+      //   state.totalItems = cart.totalItems;
+      //   state.totalPrice = cart.totalPrice;
+      //   state.items = action.payload.data.items
+      // })
+
+      .addCase(fetchCartAPI.fulfilled, (state, action) => {
+  console.log("FULL FETCH PAYLOAD 👉", action.payload);
+
+  const cart = action.payload.data?.cart;
+  const summary = action.payload.data?.priceSummary;
+
+  state.items = cart?.items || [];
+  state.totalItems = summary?.totalItems || 0;
+  state.totalPrice = summary?.totalPrice || 0;
+})
+
+
+      // /* CLEAR */
+      // .addCase(clearCartAPI.fulfilled, (state) => {
+      //   state.items = [];
+      //   state.totalItems = 0;
+      //   state.totalPrice = 0;
+      // });
+
+      .addCase(clearCartAPI.fulfilled, (state, action) => {
+        const removedProductId = action.meta.arg;
+
+        state.items = state.items.filter(
+          (item) =>
+            item.productId?._id !== removedProductId &&
+            item.productId !== removedProductId
+        );
+
+        state.totalItems = state.items.length;
+        state.totalPrice = state.items.reduce(
+          (sum, item) => sum + item.productId.price * item.quantity,
+          0
+        );
+      });
+  },
+});
+
+export default cartSlice.reducer;

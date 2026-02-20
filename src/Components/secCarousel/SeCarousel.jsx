@@ -1,4 +1,4 @@
-import phone from '../../assets/product3.jpg';
+import phone from '../../assets/taza-cart-1.png';
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";

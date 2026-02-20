@@ -52,11 +52,14 @@ const CategoryProduct = React.memo(({ cat }) => {
   return (
     <div className="flex flex-col hover:scale-105 justify-between items-center border rounded-2xl shadow-md hover:shadow-lg transition w-full h-auto min-h-60 p-3">
       <Link to={`/category/itemDetails`} state={{ catData: cat }}>
-        <img
-          src={`${import.meta.env.VITE_BASE_URL}${cat.images[0]}`}
-          alt="product-img"
-          className="w-24 h-24 object-contain"
-        />
+      <div className="flex justify-center items-center text-center w-full">
+
+          <img
+            src={`${import.meta.env.VITE_BASE_URL}${cat.images?.[0]}`}
+            alt="product-img"
+            className="object-contain h-30 items-center rounded-t-sm"
+          />
+      </div>
         <div className="flex flex-col justify-center items-center">
           <p className="text-sm mt-2 font-semibold">{cat.name}</p>
           <p className="text-center text-gray-800 text-[12px]">
@@ -75,17 +78,17 @@ const CategoryProduct = React.memo(({ cat }) => {
 
       {/* Add/Remove Buttons */}
       {quantity > 0 ? (
-        <div className="flex gap-4 border border-gray-200 p-2 rounded-2xl shadow-green-500 ">
+        <div className="flex justify-between border  border-gray-300 rounded w-full   ">
           <button
             onClick={() => decreaseQuantity(cat)}
-            className="bg-red-500 text-white rounded-[8px] text-xl w-10 h- flex items-center justify-center"
+            className="px-2 text-gray-500 text-xl"
           >
             -
           </button>
           <p>{quantity}</p>
           <button
             onClick={() => increaseQuantity(cat)}
-            className="bg-green-500 text-white rounded-[8px] text-xl w-10 h- flex items-center justify-center"
+            className="px-2 text-gray-500 text-xl   "
           >
             +
           </button>

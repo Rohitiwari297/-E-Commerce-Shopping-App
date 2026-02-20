@@ -1,0 +1,21 @@
+/* Swiper pagination active bullet - white color */
+.carousel-slider .swiper-pagination-bullet-active {
+  background-color: rgb(255, 255, 255) !important;
+
+}
+
+/* Swiper pagination inactive bullet */
+.carousel-slider .swiper-pagination-bullet {
+  background-color: rgba(255, 255, 255, 0.993) !important;
+}
+
+/* Optional: Increase bullet size */
+.carousel-slider .swiper-pagination-bullet {
+  width: 10px !important;
+  height: 10px !important;
+}
+
+.carousel-slider .swiper-pagination-bullet-active {
+  width: 12px !important;
+  height: 12px !important;
+}
