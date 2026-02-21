@@ -15,7 +15,7 @@ export const getProductDetsils = createAsyncThunk(
                 console.log('productBySubCat:', response)
                 return response.data.data;  // backend se jo data aa raha hai
             } else {
-                const response = await axiosInstance.get(`/api/products?limit=24`)
+                const response = await axiosInstance.get(`api/products/sections/by-category`)
                 return response.data.data;  // backend se jo data aa raha hai
             }
         } catch (error) {

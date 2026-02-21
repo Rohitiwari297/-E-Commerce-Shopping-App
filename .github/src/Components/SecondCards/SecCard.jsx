@@ -14,7 +14,7 @@ function SecCard() {
   return (
     <div className="w-full px-4 md:px-6 lg:px-8 py-8">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-center text-xl md:text-2xl lg:text-1.5rem font-bold text-gray-800 mb-8">Shop By Categories</h2>
+        <h1 className="text-2xl md:text-xl lg:text-1.5rem font-semibold text-center mb-3 -mt-3">Shop By Categories</h1>
 
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 md:gap-4 lg:gap-6">
           {cateData.map((cat) => (

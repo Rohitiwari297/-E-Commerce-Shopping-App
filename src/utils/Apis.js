@@ -75,11 +75,13 @@ export const getAddress = async (setAllAddress) => {
 }
 
 
-export const placeOrder = async (address, paymentMethod) => {
+export const placeOrder = async (address, paymentMethod, customerMobile, customerName) => {
     try {
         const res = await axiosInstance.post(`/api/orders/place`, {
             paymentMethod: paymentMethod,
-            shippingAddress: address
+            shippingAddress: address,
+            customerName: customerName,
+            customerMobile: customerMobile
         });
         toast.success(res.data.message)
         console.log(res.data)

@@ -22,7 +22,7 @@ function MainRouter() {
       </section>
 
       {/* ================= CARDS / BANNERS ================= */}
-      <section className="max-w-7xl my-14 px-3 sm:px-6  space-y-8 pb-10">
+      <section className="max-w-7xl  px-3 sm:px-6  space-y-8 pb-10">
         <FourthCard />
         {/* 
       <FifCard img={chalImg} />
