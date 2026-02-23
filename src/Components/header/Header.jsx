@@ -11,10 +11,11 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import Badge from '@mui/material/Badge';
 import { useSelector, useDispatch } from 'react-redux';
 import Location from '../../helper/Location';
-import { getCategories } from '../../utils/Apis';
+import { getCategories, getProduct } from '../../utils/Apis';
 import { getCat } from '../../redux/features/category/categotySlice';
 import { UserCircle2 } from 'lucide-react';
 import CartDrawer from '../CartDrawer/CartDrawer';
+import UserDrawer from '../UserDrawer/UserDrawer';
 import { getGuestCart } from '../../utils/guestCart';
 
 function Header() {
@@ -22,6 +23,7 @@ function Header() {
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [userSession, setUserSession] = useState(null);
   const [guestCartRefresh, setGuestCartRefresh] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
 
   //DRAWER
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -88,6 +90,15 @@ function Header() {
     navigate('/Login');
   };
 
+  // NEW: Handle search
+  const handleSearch = (e) => {
+    if (e) e.preventDefault();
+    if (searchQuery.trim()) {
+      // Navigate to search page with query
+      navigate(`/search?query=${encodeURIComponent(searchQuery)}`);
+    }
+  };
+
   //
   useEffect(() => {
     getCategories({ setCategoryDetails });
@@ -110,13 +121,13 @@ function Header() {
   //console.log('categoryDetailsrrrrr',categoryData);
 
   return (
-    <div className="sticky top-0 z-50 bg-white shadow-md border-b border-gray-200">
-      <div className="w-full px-4 md:px-6 lg:px-8">
+    <div className="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* ================= HEADER ================= */}
         <header className="flex items-center justify-between h-16 px-3 md:px-5 md:h-20 lg:h-24 gap-2 md:gap-4">
           {/* LOGO */}
           <div onClick={() => navigate('/')} className="flex items-center cursor-pointer hover:opacity-80 transition flex-shrink-0">
-            <img src={logo} alt="logo" className="h-12 sm:h-14 md:h-16 lg:h-24 w-auto object-contain" />
+            <img src={logo} alt="logo" className="h-18 sm:h-18 md:h-16 lg:h-24 w-auto object-contain" />
           </div>
 
           {/* LOCATION (DESKTOP & MOBILE) */}
@@ -125,15 +136,24 @@ function Header() {
           </div>
 
           {/* SEARCH (DESKTOP) */}
-          <div className="hidden md:flex flex-1 mx-6 max-w-lg">
-            <input
-              type="text"
-              placeholder="Search for products..."
-              className="w-full h-10 px-3 border border-gray-300 rounded-l-md text-sm focus:ring-2 focus:ring-green-600 focus:border-transparent outline-none transition"
-            />
-            <button className="w-12 bg-green-600 text-white rounded-r-md flex items-center justify-center hover:bg-green-700 transition">
-              <IoMdSearch size={20} />
-            </button>
+          <div className="hidden md:flex flex-1 mx-8 max-w-xl group">
+            <div className="relative w-full flex items-center">
+              <input
+                type="text"
+                placeholder="Search for products, categories..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch(e)}
+                className="w-full h-11 pl-12 pr-4 bg-gray-50 border border-gray-200 rounded-full text-sm focus:bg-white focus:ring-2 focus:ring-green-600/20 focus:border-green-600 outline-none transition-all duration-300"
+              />
+              <IoMdSearch className="absolute left-4 text-gray-400 group-focus-within:text-green-600 transition-colors" size={20} />
+              <button
+                onClick={handleSearch}
+                className="absolute right-1.5 h-8 px-5 bg-green-600 text-white rounded-full text-xs font-semibold hover:bg-green-700 active:scale-95 transition-all shadow-sm"
+              >
+                Search
+              </button>
+            </div>
           </div>
 
           {/* DESKTOP RIGHT MENU */}
@@ -229,79 +249,48 @@ function Header() {
 
           {/* MOBILE ICONS */}
           <div className="md:hidden flex items-center gap-4">
-            <Link to="/cartPage">
+            <Link to="/cartPage" className="p-2 text-gray-700 hover:text-green-600 transition-colors bg-gray-50 rounded-full">
               <Badge badgeContent={badgeCount} color="error">
-                <IoCartOutline size={26} />
+                <IoCartOutline size={24} />
               </Badge>
             </Link>
-            <button onClick={() => setMenuOpen(!menuOpen)}>
+            <button 
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="p-2 text-gray-700 hover:text-green-600 transition-colors bg-gray-50 rounded-full"
+            >
               <UserCircle2 size={24} />
             </button>
           </div>
         </header>
 
         {/* MOBILE SEARCH */}
-        <div className="md:hidden flex gap-2 pb-3 px-5">
-          <input
-            type="text"
-            placeholder="Search products..."
-            className="flex-1 h-10 border border-gray-300 rounded-md px-3 text-sm focus:ring-2 focus:ring-green-600 outline-none"
-          />
-          <button className="h-10 w-10 bg-green-600 text-white rounded-md flex items-center justify-center hover:bg-green-700 transition">
-            <IoMdSearch size={18} />
-          </button>
+        <div className="md:hidden pb-4 px-2">
+          <div className="relative flex items-center group">
+            <input
+              type="text"
+              placeholder="Search for products..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch(e)}
+              className="w-full h-11 pl-11 pr-4 bg-gray-50 border border-gray-200 rounded-full text-sm focus:bg-white focus:ring-2 focus:ring-green-600/20 focus:border-green-600 outline-none transition-all shadow-sm"
+            />
+            <IoMdSearch className="absolute left-4 text-gray-400 group-focus-within:text-green-600 transition-colors" size={20} />
+            <button
+              onClick={handleSearch}
+              className="absolute right-1.5 h-8 px-4 bg-green-600 text-white rounded-full text-xs font-semibold hover:bg-green-700 transition-all active:scale-95"
+            >
+              Go
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* ================= MOBILE MENU ================= */}
-      {menuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-200 shadow-lg absolute top-30 right-2 w-1/2 rounded-lg">
-          <div className="px-4 py-3">
-            {userSession ? (
-              <>
-                <button
-                  onClick={() => {
-                    navigate('/delivery/history');
-                    setMenuOpen(false);
-                  }}
-                  className="block w-full text-left text-[16px] py-2 text-gray-700 hover:text-green-600 transition"
-                >
-                  My Orders
-                </button>
-                <button
-                  onClick={() => {
-                    navigate('/Profile');
-                    setMenuOpen(false);
-                  }}
-                  className="block w-full text-left text-[16px] py-2 text-gray-700 hover:text-green-600 transition"
-                >
-                  My Profile
-                </button>
-                <button
-                  onClick={handleLogout}
-                  className="block w-full text-left text-[16px] py-2 text-red-600 hover:text-red-700 transition"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <Link
-                to="/Login"
-                className="block text-[16px] py-2 text-gray-700 hover:text-green-600 transition"
-                onClick={() => setMenuOpen(false)}
-              >
-                Login
-              </Link>
-            )}
-          </div>
-          <button
-            onClick={() => setMenuOpen(false)}
-            className="flex w-full justify-center px-3 py-2 rounded-lg items-center bg-gray-100 hover:bg-gray-200 text-gray-600 transition"
-          >
-            <IoMdClose size={24} />
-          </button>
-        </div>
-      )}
+      <UserDrawer 
+        open={menuOpen} 
+        onClose={() => setMenuOpen(false)} 
+        user={user} 
+        onLogout={handleLogout} 
+      />
     </div>
   );
 }

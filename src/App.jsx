@@ -12,8 +12,9 @@ import CartPage from './pages/CartPages/CartPage';
 import DeliveryHistory from './pages/DeliveryHistory';
 import PaymentPage from './pages/PaymentPage';
 import OrderHistory from './pages/OderHistory';
-import AddressModalPage from './pages/AddressModalPage ';
+import AddressModalPage from './pages/AddressModalPage';
 import Profile from './pages/Profile';
+import Search from './pages/Search';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { fetchCartAPI } from './redux/features/cart/cartSlice';
@@ -59,6 +60,7 @@ function App() {
           <Route path="/orderHistory" element={<OrderHistory />} />
           <Route path="/delivery/address" element={<AddressModalPage />} />
           <Route path="/delivery/profile" element={<Profile />} />
+          <Route path="/search" element={<Search />} />
         </Routes>
       </main>
       <Footer />

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
-import AddressModalPage from '../AddressModalPage '; // import the AddressModalPage component
+import AddressModalPage from '../AddressModalPage'; // import the AddressModalPage component
 import { MdCreditCard, MdLocationOn, MdPayments } from 'react-icons/md';
 import { fetchCartAPI, updateCartQuantityAPI } from '../../redux/features/cart/cartSlice';
 import CartItem from './CartItem';

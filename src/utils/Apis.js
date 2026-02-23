@@ -105,3 +105,18 @@ export const getOrderHistory = async () => {
         toast.error(error.message)
     }
 }
+
+/**
+ * Get Products with search query
+ */
+export const getProduct = async (searchQuery) => {
+    try {
+        const response = await axiosInstance.get(`/api/products?search=${encodeURIComponent(searchQuery)}`);
+        // The API returns { data: { products: [...], totalPages: ... } }
+        return response.data?.data?.products || response.data?.products || [];
+    } catch (error) {
+        console.log("Search error:", error);
+        toast.error("Error fetching products");
+        return [];
+    }
+}
