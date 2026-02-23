@@ -8,6 +8,8 @@ import { MdCreditCard, MdLocationOn, MdPayments } from 'react-icons/md';
 import { fetchCartAPI, updateCartQuantityAPI } from '../../redux/features/cart/cartSlice';
 import CartItem from './CartItem';
 import { getAddress, placeOrder } from '../../utils/Apis';
+import { getGuestCart } from '../../utils/guestCart';
+import GuestCartItem from './GuestCartItem';
 import toast from 'react-hot-toast';
 
 function CartPage() {
@@ -53,9 +55,6 @@ function CartPage() {
    */
   const { items = [], totalItems, totalPrice } = useSelector((state) => state.addToCartData);
   console.log('Redux cart:', items, totalPrice);
-  // total discount
-  const totalDiscount = items.map((i) => i?.productId?.originalPrice).reduce((total, item) => total + item, 0);
-  console.log('totalDiscount', totalDiscount);
 
   /**
    *
@@ -65,6 +64,17 @@ function CartPage() {
    */
   const { user } = useSelector((state) => state.auth);
   console.log('Redux user:', user);
+
+  // choose display items: server cart for logged-in user, guest cart for guests
+  const guestCart = getGuestCart();
+  const displayItems = user ? items : guestCart;
+
+  // total discount (safe for both shapes)
+  const totalDiscount = (displayItems || []).reduce((acc, i) => {
+    const orig = i?.productId?.originalPrice ?? i.originalPrice ?? 0;
+    return acc + (orig || 0) * (i.quantity || 1);
+  }, 0);
+  console.log('totalDiscount', totalDiscount);
 
   // inside CartPage...
 
@@ -168,7 +178,7 @@ function CartPage() {
 
   return (
     <div className="container mx-auto p-3 sm:p-4 lg:p-6">
-      {items.length === 0 ? (
+      {(displayItems || []).length === 0 ? (
         /* EMPTY CART UI */
         <div className="flex flex-col items-center justify-center py-16 sm:py-24 text-center">
           <div className="w-20 h-20 sm:w-24 sm:h-24 mb-6 flex items-center justify-center rounded-full bg-green-100">
@@ -191,9 +201,13 @@ function CartPage() {
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
           {/* Cart Items */}
           <div className="flex-1 flex flex-col gap-3 sm:gap-4">
-            {items.map((item) => (
-              <CartItem key={item?.productId?._id || item.id} item={item} />
-            ))}
+            {user
+              ? items.map((item) => <CartItem key={item?.productId?._id || item.id} item={item} />)
+              : displayItems.map((item) => (
+                  <React.Suspense key={item._id || item.productId?._id} fallback={null}>
+                    <GuestCartItem item={item} onChange={() => window.location.reload()} />
+                  </React.Suspense>
+                ))}
           </div>
 
           {/* Price Details */}

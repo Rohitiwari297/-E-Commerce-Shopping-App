@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getProductDetsils } from '../../redux/features/product/productSlice.js';
 import { addToCartAPI, clearCartAPI, fetchCartAPI, updateCartQuantityAPI } from '../../redux/features/cart/cartSlice.js';
+import { getGuestCart, setGuestCart } from '../../utils/guestCart.js';
 
 function FourthCard() {
   const baseUrl = import.meta.env.VITE_BASE_URL?.replace(/\/$/, '');
@@ -14,6 +15,18 @@ function FourthCard() {
   console.log('Full prodDetails:', prodDetails);
   console.log('Parsed prodData:', prodData);
 
+  const user = useSelector((state) => state.auth?.user);
+  console.log('user', user);
+
+  // GET LOCALSTORAGE CART
+  const guestCart = getGuestCart();
+  console.log('guestCart', guestCart);
+  const [guestCartVersion, setGuestCartVersion] = React.useState(0);
+
+  const refreshGuestCart = () => {
+    setGuestCartVersion((prev) => prev + 1);
+  };
+
   const cartItems = useSelector((state) => state.addToCartData?.items) || [];
   console.log('cartItems', cartItems);
 
@@ -21,8 +34,21 @@ function FourthCard() {
   // This ensures the component ONLY re-renders if THIS product's quantity changes.
   const getItemQuantity = (productOrId) => {
     const id = productOrId?._id || productOrId;
-    const foundItem = cartItems.find((i) => i?.productId?._id === id);
-    return Number(foundItem?.quantity || 0);
+
+    // If user is logged in, read quantity from redux cart
+    if (user) {
+      const foundItem = cartItems.find((i) => i?.productId?._id === id);
+      return Number(foundItem?.quantity || 0);
+    }
+
+    // If guest, read quantity from localStorage guest cart
+    try {
+      const guest = getGuestCart();
+      const found = guest.find((i) => i?._id === id);
+      return Number(found?.quantity || 0);
+    } catch (err) {
+      return 0;
+    }
   };
 
   /* FETCH PRODUCTS BY CATEGORY */
@@ -32,7 +58,17 @@ function FourthCard() {
 
   // Addition and removal handlers
   const handleAddItems = async (item) => {
-    //alert("Abhi tumhari haisiyat mujhe karidane ki nhi mere bachhe!")
+    if (!user) {
+      const cart = getGuestCart();
+      const existing = cart.find((i) => i._id === item._id);
+
+      if (existing) {
+        existing.quantity += 1;
+        setGuestCart(cart);
+      }
+      return;
+    }
+
     await dispatch(
       updateCartQuantityAPI({
         productId: item._id,
@@ -42,13 +78,30 @@ function FourthCard() {
   };
 
   const handleDeleteItems = async (item) => {
+    if (!user) {
+      let cart = getGuestCart();
+      const existing = cart.find((i) => i._id === item._id);
+
+      if (!existing) return;
+
+      if (existing.quantity <= 1) {
+        cart = cart.filter((i) => i._id !== item._id);
+      } else {
+        existing.quantity -= 1;
+      }
+
+      setGuestCart(cart);
+      return;
+    }
+
     const currentQty = getItemQuantity(item);
+
     if (currentQty <= 1) {
-      const id = item._id;
-      await dispatch(clearCartAPI(id));
+      await dispatch(clearCartAPI(item._id));
       await dispatch(fetchCartAPI());
       return;
     }
+
     await dispatch(
       updateCartQuantityAPI({
         productId: item._id,
@@ -58,13 +111,27 @@ function FourthCard() {
   };
 
   const handleAddToCart = async (item) => {
+    if (!user) {
+      const cart = getGuestCart();
+      const existing = cart.find((i) => i._id === item._id);
+
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        cart.push({ ...item, quantity: 1 });
+      }
+
+      setGuestCart(cart);
+      return;
+    }
+
     await dispatch(
       addToCartAPI({
         productId: item._id,
         quantity: 1,
-        //productDetails: item, // Pass full details for optimistic/manual population
       }),
     );
+
     dispatch(fetchCartAPI());
   };
 
@@ -158,29 +225,49 @@ function FourthCard() {
                         </div>
 
                         {/* Add to Cart / Quantity Controls */}
-                        <div className="p-3 border-t border-gray-100">
+                        <div className="p-3 border-t border-gray-100 bg-gray-50">
+                          {/* Guest Badge */}
+
                           {qty > 0 ? (
-                            <div className="flex items-center justify-between gap-1">
-                              <button
-                                onClick={() => handleDeleteItems(product)}
-                                className="px-2 py-1.5 bg-red-50 text-red-600 text-sm font-semibold rounded hover:bg-red-100 transition"
-                              >
-                                −
-                              </button>
-                              <span className="flex-1 text-center font-bold text-gray-700">{qty}</span>
-                              <button
-                                onClick={() => handleAddItems(product)}
-                                className="px-2 py-1.5 bg-green-50 text-green-600 text-sm font-semibold rounded hover:bg-green-100 transition"
-                              >
-                                +
-                              </button>
+                            <div className="flex flex-col gap-2">
+                              {/* Quantity Controls */}
+                              <div className="flex items-center justify-between bg-white rounded-md border border-gray-200 overflow-hidden shadow-sm">
+                                <button
+                                  onClick={() => {
+                                    handleDeleteItems(product);
+                                    if (!user) refreshGuestCart();
+                                  }}
+                                  className="w-8 h-8 flex items-center justify-center text-red-600 hover:bg-red-50 transition active:scale-90"
+                                >
+                                  −
+                                </button>
+
+                                <span className="flex-1 text-center font-semibold text-gray-800">{qty}</span>
+
+                                <button
+                                  onClick={() => {
+                                    handleAddItems(product);
+                                    if (!user) refreshGuestCart();
+                                  }}
+                                  className="w-8 h-8 flex items-center justify-center text-green-600 hover:bg-green-50 transition active:scale-90"
+                                >
+                                  +
+                                </button>
+                              </div>
+
+                              {/* Login Reminder */}
+                              {!user && <p className="text-[10px] text-center text-gray-400">Login to save this cart permanently</p>}
                             </div>
                           ) : (
                             <button
-                              onClick={() => handleAddToCart(product)}
-                              className="w-full px-3 py-2 bg-green-600 text-white text-sm font-semibold rounded hover:bg-green-700 transition duration-200 shadow-sm hover:shadow"
+                              onClick={() => {
+                                handleAddToCart(product);
+                                if (!user) refreshGuestCart();
+                              }}
+                              className={`w-full px-3 py-2 text-sm font-semibold rounded-md transition duration-200 shadow-sm active:scale-95
+        ${user ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white'}`}
                             >
-                              Add to cart
+                              {'Add to Cart'}
                             </button>
                           )}
                         </div>

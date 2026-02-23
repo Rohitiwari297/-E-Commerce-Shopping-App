@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { sendOtpAPI, verifyOtpAPI } from "./authAPI";
 import { saveToken, removeToken, getToken } from "../../../utils/tokenHelper";
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
 // Refresh ke baad token read
 const token = getToken();
@@ -10,7 +10,7 @@ let savedUser = null;
 // Agar token hai to usme se user decode karo
 if (token) {
   try {
-    savedUser = jwtDecode(token); 
+    savedUser = jwtDecode(token);
   } catch (error) {
     console.log("Invalid token");
   }
@@ -21,7 +21,14 @@ export const sendOtp = createAsyncThunk("auth/sendOtp", async (mobile) => {
 });
 
 export const login = createAsyncThunk("auth/login", async ({ mobile, otp }) => {
-  return await verifyOtpAPI({ mobile, otp });
+  const result = await verifyOtpAPI({ mobile, otp });
+
+  // Save token so it's available globally
+  if (result?.data?.token) {
+    saveToken(result.data.token);
+  }
+
+  return result;
 });
 
 const authSlice = createSlice({

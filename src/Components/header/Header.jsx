@@ -15,11 +15,13 @@ import { getCategories } from '../../utils/Apis';
 import { getCat } from '../../redux/features/category/categotySlice';
 import { UserCircle2 } from 'lucide-react';
 import CartDrawer from '../CartDrawer/CartDrawer';
+import { getGuestCart } from '../../utils/guestCart';
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [userSession, setUserSession] = useState(null);
+  const [guestCartRefresh, setGuestCartRefresh] = useState(0);
 
   //DRAWER
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -38,8 +40,22 @@ function Header() {
 
   //console.log("Cart Itemssssss:", items);
 
-  const totalItems = (addition?.length || 0) + (allproducts?.length || 0);
-  const allCartItems = [...addition, ...allproducts];
+  // GET LOCALSTORAGE CART - recalculate on guestCartRefresh changes
+  const guestCart = getGuestCart();
+  console.log('guestCart', guestCart, 'version:', guestCartRefresh);
+
+  // Listen to localStorage changes to update badge in real-time
+  useEffect(() => {
+    const handleGuestCartUpdate = () => {
+      setGuestCartRefresh((prev) => prev + 1);
+    };
+
+    window.addEventListener('guestCartUpdated', handleGuestCartUpdate);
+    return () => window.removeEventListener('guestCartUpdated', handleGuestCartUpdate);
+  }, []);
+
+  // Calculate badge count: use Redux items for logged-in users, guest cart for guests
+  const badgeCount = user ? (items?.length ?? 0) : (guestCart?.length ?? 0);
 
   const [categoryDetails, setCategoryDetails] = useState([]);
 
@@ -97,14 +113,14 @@ function Header() {
     <div className="sticky top-0 z-50 bg-white shadow-md border-b border-gray-200">
       <div className="w-full px-4 md:px-6 lg:px-8">
         {/* ================= HEADER ================= */}
-        <header className="flex items-center justify-between h-16 px-5 md:h-20 lg:h-24">
+        <header className="flex items-center justify-between h-16 px-3 md:px-5 md:h-20 lg:h-24 gap-2 md:gap-4">
           {/* LOGO */}
-          <div onClick={() => navigate('/')} className="flex items-center cursor-pointer hover:opacity-80 transition ">
-            <img src={logo} alt="logo" className="h-10 md:h-12 lg:h-28 w-auto object-contain" />
+          <div onClick={() => navigate('/')} className="flex items-center cursor-pointer hover:opacity-80 transition flex-shrink-0">
+            <img src={logo} alt="logo" className="h-12 sm:h-14 md:h-16 lg:h-24 w-auto object-contain" />
           </div>
 
-          {/* LOCATION (DESKTOP) */}
-          <div className="hidden md:block text-sm">
+          {/* LOCATION (DESKTOP & MOBILE) */}
+          <div className="flex text-xs md:text-sm flex-shrink-0">
             <Location />
           </div>
 
@@ -169,7 +185,7 @@ function Header() {
             {/* CART */}
             <Menu as="div" className="relative">
               <MenuButton onClick={openCart} className="flex items-center gap-1 text-gray-700 hover:text-green-600 transition">
-                <Badge badgeContent={items?.length ?? 0} color="error">
+                <Badge badgeContent={badgeCount} color="error">
                   <IoCartOutline size={22} />
                 </Badge>
               </MenuButton>
@@ -214,7 +230,7 @@ function Header() {
           {/* MOBILE ICONS */}
           <div className="md:hidden flex items-center gap-4">
             <Link to="/cartPage">
-              <Badge badgeContent={items?.length ?? 0} color="error">
+              <Badge badgeContent={badgeCount} color="error">
                 <IoCartOutline size={26} />
               </Badge>
             </Link>

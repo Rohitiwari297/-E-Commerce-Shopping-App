@@ -1,25 +1,51 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { addToCartAPI, clearCartAPI, updateCartQuantityAPI } from '../../redux/features/cart/cartSlice';
+import { addToCartAPI, clearCartAPI, updateCartQuantityAPI, fetchCartAPI } from '../../redux/features/cart/cartSlice';
+import { getGuestCart, setGuestCart } from '../../utils/guestCart';
 
 const CategoryProduct = React.memo(
   ({ cat }) => {
     console.log('CategoryProduct RENDER:', cat._id, 'Images:', cat.images);
     const dispatch = useDispatch();
+    const user = useSelector((state) => state.auth?.user);
+    const [guestCartVersion, setGuestCartVersion] = useState(0);
 
-    // OPTIMIZATION: Select ONLY the quantity for this specific product.
-    // This ensures the component ONLY re-renders if THIS product's quantity changes.
+    const refreshGuestCart = () => {
+      setGuestCartVersion((prev) => prev + 1);
+    };
+
+    // OPTIMIZATION: Select quantity for this specific product from Redux (logged-in) or guest cart
     const quantity = useSelector((state) => {
-      const items = state.addToCartData?.items || [];
-      const foundItem = items.find((i) => {
-        const productId = i?.productId?._id || i?.productId;
-        return productId === cat._id;
-      });
-      return Number(foundItem?.quantity || 0);
+      if (user) {
+        const items = state.addToCartData?.items || [];
+        const foundItem = items.find((i) => {
+          const productId = i?.productId?._id || i?.productId;
+          return productId === cat._id;
+        });
+        return Number(foundItem?.quantity || 0);
+      }
+      // Guest: read from localStorage
+      const guest = getGuestCart() || [];
+      const found = guest.find((i) => i._id === cat._id);
+      return Number(found?.quantity || 0);
     });
 
     const addToCartHandler = async (product) => {
+      if (!user) {
+        // Guest: add to localStorage
+        const cart = getGuestCart();
+        const existing = cart.find((i) => i._id === product._id);
+        if (existing) {
+          existing.quantity += 1;
+        } else {
+          cart.push({ ...product, quantity: 1 });
+        }
+        setGuestCart(cart);
+        refreshGuestCart();
+        return;
+      }
+      // Logged-in: use API
       await dispatch(
         addToCartAPI({
           productId: product._id,
@@ -30,6 +56,18 @@ const CategoryProduct = React.memo(
     };
 
     const increaseQuantity = async (product) => {
+      if (!user) {
+        // Guest: update localStorage
+        const cart = getGuestCart();
+        const existing = cart.find((i) => i._id === product._id);
+        if (existing) {
+          existing.quantity += 1;
+          setGuestCart(cart);
+          refreshGuestCart();
+        }
+        return;
+      }
+      // Logged-in: use API
       await dispatch(
         updateCartQuantityAPI({
           productId: product._id,
@@ -39,6 +77,21 @@ const CategoryProduct = React.memo(
     };
 
     const handleDeleteItems = async (item) => {
+      if (!user) {
+        // Guest: update localStorage
+        let cart = getGuestCart();
+        const existing = cart.find((i) => i._id === item._id);
+        if (!existing) return;
+        if (existing.quantity <= 1) {
+          cart = cart.filter((i) => i._id !== item._id);
+        } else {
+          existing.quantity -= 1;
+        }
+        setGuestCart(cart);
+        refreshGuestCart();
+        return;
+      }
+      // Logged-in: use API
       //const currentQty = getItemQuantity(item);
       if (quantity <= 1) {
         const id = item._id;
