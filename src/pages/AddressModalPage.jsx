@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { getAddress, saveAddress } from "../utils/Apis";
 import { Pen, Trash, MapPin } from "lucide-react";
 import { Button } from "@headlessui/react";
@@ -7,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 
 const AddressModalPage = ({ onClose, onSelectAddress }) => {
   const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
+
   // All Address
   const [address, setAddress] = useState([]);
   useEffect(() => {
@@ -27,6 +30,18 @@ const AddressModalPage = ({ onClose, onSelectAddress }) => {
     state: "",
     pincode: "",
   });
+
+  // Pre-fill user details
+  useEffect(() => {
+    if (user && showModal) {
+      setSelectedOption(prev => ({
+        ...prev,
+        name: prev.name || user.name || "",
+        email: prev.email || user.email || "",
+        mobile: prev.mobile || user.mobile || "",
+      }));
+    }
+  }, [user, showModal]);
 
   const handleChange = (e) => {
     setSelectedOption({

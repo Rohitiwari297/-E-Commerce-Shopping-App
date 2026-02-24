@@ -179,7 +179,7 @@ function Header() {
                   </MenuItem>
                   <MenuItem>
                     <button
-                      onClick={() => navigate('/Profile')}
+                      onClick={() => navigate('/delivery/history', { state: { menu: 'profile' } })}
                       className="w-full text-left px-3 py-2 hover:bg-green-50 text-sm rounded transition"
                     >
                       My Profile

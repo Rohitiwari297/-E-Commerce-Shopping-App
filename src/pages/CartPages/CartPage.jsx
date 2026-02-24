@@ -108,6 +108,14 @@ function CartPage() {
   const [customerMobile, setCustomerMobile] = useState('');
   const [customerName, setCustomerName] = useState('');
 
+  // Pre-fill user details if logged in
+  useEffect(() => {
+    if (user) {
+      if (!customerName) setCustomerName(user.name || '');
+      if (!customerMobile) setCustomerMobile(user.mobile || '');
+    }
+  }, [user]);
+
   /**
    *
    * HANDLER FOR PAYMENT METHOD

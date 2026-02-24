@@ -9,14 +9,8 @@ import chiliImg from "../assets/namk.png";
 
 // Lucide Icons for sidebar and back button
 import {
-  MapPin,
-  ShoppingBag,
-  Gift,
-  Lock,
-  LogOut,
   ArrowLeft,
   MessageSquare,
-  Settings,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -90,36 +84,9 @@ const OderHistory = () => {
 
   return (
     <div className="min-h-screen bg-white flex">
-      
-      {/* ---------------------------
-      // 1. Sidebar (Left Panel)
-      // --------------------------- */}
-      
-      {/* Sidebar */}
-            {/* <aside className="w-64 bg-white border-r shadow-sm p-6">
-              <div className="text-center border-b mb-8">
-                <p className="text-sm text-gray-600 font-medium" >Rohit Tripathi</p>
-                <p className="text-sm text-gray-600 font-medium">+919560613581</p>
-              </div>
-              <nav className="space-y-4 text-gray-700">
-                <button className="flex items-center gap-3 w-full text-left hover:text-green-700">
-                  <MapPin size={18} /> My Addresses
-                </button>
-                <button className="flex items-center gap-3 w-full text-left hover:text-green-700">
-                  <ShoppingBag size={18} /> My Orders
-                </button>
-                <button className="flex items-center gap-3 w-full text-left hover:text-green-700">
-                  <Settings size={18} /> Setting
-                </button>
-                
-                <button className="flex items-center gap-3 w-full text-left text-red-600 hover:text-red-700 mt-6">
-                  <LogOut size={18} /> Logout
-                </button>
-              </nav>
-            </aside> */}
 
       {/* ---------------------------
-      // 2. Main Content (Order Details)
+      // Main Content (Order Details)
       // --------------------------- */}
       
       <main className="flex-1 max-w-full  mx-auto px-4 py-6 bg-white">

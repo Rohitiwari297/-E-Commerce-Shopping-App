@@ -7,7 +7,6 @@ import {
   CheckCircle2,
   XCircle,
   Truck,
-  AlertCircle,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getOrderHistory } from "../utils/Apis";
@@ -148,7 +147,7 @@ function DeliveryPage() {
                 </div>
                 
                 <button 
-                  onClick={() => navigate("/orderHistory")}
+                  onClick={() => navigate("/orderHistory/" + order._id)}
                   className="text-xs font-bold text-gray-400 hover:text-green-600 transition-colors uppercase tracking-widest"
                 >
                   View Details →

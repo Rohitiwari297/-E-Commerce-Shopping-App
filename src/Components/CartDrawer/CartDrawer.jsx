@@ -163,6 +163,11 @@ function CartDrawer({ open, onClose, data = [] }) {
                         <h4 className="item-name">{item.productId?.name}</h4>
 
                         <p className="item-description">
+                          {item.variants?.length > 0 && (
+                            <span className="variant-badge bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded text-[10px] font-bold mr-2 uppercase">
+                              {item.variants?.[0]?.unit}
+                            </span>
+                          )}
                           Qty: <span>{item.quantity}</span>
                         </p>
 

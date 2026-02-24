@@ -27,7 +27,8 @@ export const mergeGuestCartToUserCart = async () => {
                     `${import.meta.env.VITE_BASE_URL}api/cart/add`,
                     {
                         productId: item._id,
-                        quantity: item.quantity || 1
+                        quantity: item.quantity || 1,
+                        variants: item.selectedVariantId ? [item.selectedVariantId] : []
                     },
                     {
                         headers: {

@@ -112,7 +112,7 @@ import axios from "axios";
 /* ================= ADD TO CART ================= */
 export const addToCartAPI = createAsyncThunk(
   "cart/add",
-  async ({ productId, quantity }, { rejectWithValue }) => {
+  async ({ productId, quantity, variants }, { rejectWithValue }) => {
     try {
 
       const token = localStorage.getItem("token")
@@ -120,7 +120,8 @@ export const addToCartAPI = createAsyncThunk(
         `${import.meta.env.VITE_BASE_URL}api/cart/add`,
         {
           productId,
-          quantity
+          quantity,
+          variants
         },
         {
           headers: {
@@ -138,15 +139,16 @@ export const addToCartAPI = createAsyncThunk(
 /* ================= REMOVE FROM CART QUANTITY ================= */
 export const updateCartQuantityAPI = createAsyncThunk(
   "cart/update",
-  async ({ productId, quantity }, { rejectWithValue }) => {
-    console.log('productId:', productId, "quantity:", quantity)
+  async ({ productId, quantity, variants }, { rejectWithValue }) => {
+    console.log('productId:', productId, "quantity:", quantity, "variants:", variants)
     try {
       const token = localStorage.getItem("token")
       const res = await axios.patch(
         `${import.meta.env.VITE_BASE_URL}api/cart/update`,
         {
           productId,
-          quantity: String(quantity)
+          quantity: String(quantity),
+          variants
         },
         {
           headers: {
@@ -190,7 +192,7 @@ export const clearCartAPI = createAsyncThunk(
     console.log("idddd:", id)
     try {
       const token = localStorage.getItem("token")
-      if (id){
+      if (id) {
         const res = await axios.delete(
           `${import.meta.env.VITE_BASE_URL}api/cart/${id}`,
           {
@@ -200,7 +202,7 @@ export const clearCartAPI = createAsyncThunk(
           }
         );
         return res.data;
-      }else{
+      } else {
         const res = await axios.delete(
           `${import.meta.env.VITE_BASE_URL}/api/cart`,
           {
@@ -278,6 +280,8 @@ const cartSlice = createSlice({
       .addCase(updateCartQuantityAPI.fulfilled, (state, action) => {
         // Merge logic: Preserve populated productId if available
         const newItems = action.payload.data.items;
+        const sentDetails = action.meta.arg.productDetails; // Access passed full details
+
         state.items = newItems.map((newItem) => {
           const newItemId = newItem.productId._id || newItem.productId;
           const existingItem = state.items.find((old) => {
@@ -288,6 +292,11 @@ const cartSlice = createSlice({
           if (existingItem && typeof existingItem.productId === 'object') {
             return { ...newItem, productId: existingItem.productId };
           }
+
+          if (sentDetails && sentDetails._id === newItemId) {
+            return { ...newItem, productId: sentDetails };
+          }
+
           return newItem;
         });
 
@@ -306,15 +315,15 @@ const cartSlice = createSlice({
       // })
 
       .addCase(fetchCartAPI.fulfilled, (state, action) => {
-  console.log("FULL FETCH PAYLOAD 👉", action.payload);
+        console.log("FULL FETCH PAYLOAD 👉", action.payload);
 
-  const cart = action.payload.data?.cart;
-  const summary = action.payload.data?.priceSummary;
+        const cart = action.payload.data?.cart;
+        const summary = action.payload.data?.priceSummary;
 
-  state.items = cart?.items || [];
-  state.totalItems = summary?.totalItems || 0;
-  state.totalPrice = summary?.totalPrice || 0;
-})
+        state.items = cart?.items || [];
+        state.totalItems = summary?.totalItems || 0;
+        state.totalPrice = summary?.totalPrice || 0;
+      })
 
 
       // /* CLEAR */

@@ -43,7 +43,11 @@ function UserDrawer({ open, onClose, user, onLogout }) {
   ];
 
   const handleNav = (path) => {
-    navigate(path);
+    if (path === '/Profile' || path === '/delivery/profile') {
+      navigate('/delivery/history', { state: { menu: 'profile' } });
+    } else {
+      navigate(path);
+    }
     onClose();
   };
 

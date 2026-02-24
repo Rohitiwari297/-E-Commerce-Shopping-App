@@ -4,8 +4,7 @@ import { Link } from 'react-router-dom';
 import { addToCartAPI, clearCartAPI, updateCartQuantityAPI, fetchCartAPI } from '../../redux/features/cart/cartSlice';
 import { getGuestCart, setGuestCart } from '../../utils/guestCart';
 
-const CategoryProduct = React.memo(
-  ({ cat }) => {
+function CategoryProduct({ cat }) {
     console.log('CategoryProduct RENDER:', cat._id, 'Images:', cat.images);
     const dispatch = useDispatch();
     const user = useSelector((state) => state.auth?.user);
@@ -15,19 +14,39 @@ const CategoryProduct = React.memo(
       setGuestCartVersion((prev) => prev + 1);
     };
 
+    // State to track selected variant
+    const [selectedVariantId, setSelectedVariantId] = useState(cat?.variants?.[0]?._id);
+
+    const handleVariantChange = (e) => {
+      setSelectedVariantId(e.target.value);
+    };
+
     // OPTIMIZATION: Select quantity for this specific product from Redux (logged-in) or guest cart
     const quantity = useSelector((state) => {
+      const id = String(cat?._id);
       if (user) {
         const items = state.addToCartData?.items || [];
         const foundItem = items.find((i) => {
-          const productId = i?.productId?._id || i?.productId;
-          return productId === cat._id;
+          const itemProdId = String(i?.productId?._id || i?.productId);
+          if (itemProdId !== id) return false;
+          
+          if (selectedVariantId && i?.variants && i.variants.length > 0) {
+            return i.variants.some(v => String(v?._id || v) === String(selectedVariantId));
+          }
+          
+          return true;
         });
         return Number(foundItem?.quantity || 0);
       }
-      // Guest: read from localStorage
+      
       const guest = getGuestCart() || [];
-      const found = guest.find((i) => i._id === cat._id);
+      const found = guest.find((i) => {
+        if (String(i?._id) !== id) return false;
+        if (selectedVariantId) {
+          return String(i.selectedVariantId) === String(selectedVariantId);
+        }
+        return !i.selectedVariantId;
+      });
       return Number(found?.quantity || 0);
     });
 
@@ -35,11 +54,11 @@ const CategoryProduct = React.memo(
       if (!user) {
         // Guest: add to localStorage
         const cart = getGuestCart();
-        const existing = cart.find((i) => i._id === product._id);
+        const existing = cart.find((i) => String(i._id) === String(product._id) && (!selectedVariantId || String(i.selectedVariantId) === String(selectedVariantId)));
         if (existing) {
           existing.quantity += 1;
         } else {
-          cart.push({ ...product, quantity: 1 });
+          cart.push({ ...product, quantity: 1, selectedVariantId });
         }
         setGuestCart(cart);
         refreshGuestCart();
@@ -51,15 +70,15 @@ const CategoryProduct = React.memo(
           productId: product._id,
           quantity: 1,
           productDetails: product, // Pass full details for optimistic/manual population
+          variants: selectedVariantId ? [selectedVariantId] : [],
         }),
       );
     };
 
     const increaseQuantity = async (product) => {
       if (!user) {
-        // Guest: update localStorage
         const cart = getGuestCart();
-        const existing = cart.find((i) => i._id === product._id);
+        const existing = cart.find((i) => String(i._id) === String(product._id) && (!selectedVariantId || String(i.selectedVariantId) === String(selectedVariantId)));
         if (existing) {
           existing.quantity += 1;
           setGuestCart(cart);
@@ -67,23 +86,24 @@ const CategoryProduct = React.memo(
         }
         return;
       }
-      // Logged-in: use API
       await dispatch(
         updateCartQuantityAPI({
           productId: product._id,
           quantity: quantity + 1,
+          variants: selectedVariantId ? [selectedVariantId] : [],
+          productDetails: product,
         }),
       );
+      dispatch(fetchCartAPI());
     };
 
     const handleDeleteItems = async (item) => {
       if (!user) {
-        // Guest: update localStorage
         let cart = getGuestCart();
-        const existing = cart.find((i) => i._id === item._id);
+        const existing = cart.find((i) => String(i._id) === String(item._id) && (!selectedVariantId || String(i.selectedVariantId) === String(selectedVariantId)));
         if (!existing) return;
         if (existing.quantity <= 1) {
-          cart = cart.filter((i) => i._id !== item._id);
+          cart = cart.filter((i) => !(String(i._id) === String(item._id) && (!selectedVariantId || String(i.selectedVariantId) === String(selectedVariantId))));
         } else {
           existing.quantity -= 1;
         }
@@ -91,11 +111,9 @@ const CategoryProduct = React.memo(
         refreshGuestCart();
         return;
       }
-      // Logged-in: use API
-      //const currentQty = getItemQuantity(item);
+
       if (quantity <= 1) {
-        const id = item._id;
-        await dispatch(clearCartAPI(id));
+        await dispatch(clearCartAPI(item._id));
         await dispatch(fetchCartAPI());
         return;
       }
@@ -103,8 +121,11 @@ const CategoryProduct = React.memo(
         updateCartQuantityAPI({
           productId: item._id,
           quantity: quantity - 1,
+          variants: selectedVariantId ? [selectedVariantId] : [],
+          productDetails: cat,
         }),
       );
+      dispatch(fetchCartAPI());
     };
 
     return (
@@ -127,14 +148,47 @@ const CategoryProduct = React.memo(
             {/* Description */}
             {cat.description && <p className="text-xs text-gray-500 line-clamp-1">{cat.description}</p>}
 
-            {/* Price & Unit */}
-            <div className="flex items-center justify-between mt-auto pt-2">
-              <div className="flex gap-1 items-center">
-                <p className="text-sm font-bold text-green-600">₹{cat.currentPrice}</p>
-                {cat.originalPrice && <p className="text-xs line-through text-gray-400">₹{cat.originalPrice}</p>}
-              </div>
+            {/* Price & Variant Selection */}
+            <div className="flex flex-col gap-2 mt-auto pt-2">
+              <div className="flex items-center justify-between gap-2">
+                {/* Price */}
+                <div className="flex flex-col">
+                  <p className="text-sm font-bold text-green-600">
+                    ₹{cat.variants?.find((v) => v._id === selectedVariantId)?.price || cat.currentPrice}
+                  </p>
+                  {cat.originalPrice && <p className="text-[10px] line-through text-gray-400 leading-none">₹{cat.originalPrice}</p>}
+                </div>
 
-              {cat.unit && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">{cat.unit}</span>}
+                {/* Variant Dropdown */}
+                {cat.variants?.length > 0 && (
+                  <div className="flex flex-col items-end gap-1">
+                    <div className="relative min-w-[80px]">
+                      <select
+                        value={selectedVariantId}
+                        onChange={handleVariantChange}
+                        className="w-full text-[11px] font-medium bg-gray-50 border border-gray-200 rounded px-2 py-1 outline-none focus:border-green-500 appearance-none cursor-pointer pr-5 hover:bg-white transition-colors"
+                      >
+                        {cat.variants.map((v) => (
+                          <option key={v._id} value={v._id}>
+                            {v.unit}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-1.5 pointer-events-none text-gray-400">
+                        <svg className="w-3 h-3 fill-current" viewBox="0 0 20 20">
+                          <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                        </svg>
+                      </div>
+                    </div>
+                    {/* Stock Indicator */}
+                    <span className={`text-[10px] font-medium ${(cat.variants?.find(v => v._id === selectedVariantId)?.stock || 0) > 0 ? 'text-gray-400' : 'text-red-500'}`}>
+                      {(cat.variants?.find(v => v._id === selectedVariantId)?.stock || 0) > 0 
+                        ? `Stock: ${cat.variants?.find(v => v._id === selectedVariantId)?.stock}` 
+                        : 'Out of Stock'}
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </Link>
@@ -154,7 +208,8 @@ const CategoryProduct = React.memo(
 
               <button
                 onClick={() => increaseQuantity(cat)}
-                className="px-2 py-1.5 bg-green-50 text-green-600 text-sm font-semibold rounded hover:bg-green-100 transition"
+                disabled={(cat.variants?.find(v => v._id === selectedVariantId)?.stock || 0) <= quantity}
+                className="px-2 py-1.5 bg-green-50 text-green-600 text-sm font-semibold rounded hover:bg-green-100 transition disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 +
               </button>
@@ -162,17 +217,16 @@ const CategoryProduct = React.memo(
           ) : (
             <button
               onClick={() => addToCartHandler(cat)}
-              className="w-full px-3 py-2 bg-green-600 text-white text-sm font-semibold rounded hover:bg-green-700 transition duration-200 shadow-sm hover:shadow"
+              disabled={(cat.variants?.find(v => v._id === selectedVariantId)?.stock || 0) === 0}
+              className="w-full px-3 py-2 bg-green-600 text-white text-sm font-semibold rounded hover:bg-green-700 transition duration-200 shadow-sm hover:shadow disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
               type="button"
             >
-              Add to Cart
+              {(cat.variants?.find(v => v._id === selectedVariantId)?.stock || 0) === 0 ? 'Out of Stock' : 'Add to Cart'}
             </button>
           )}
         </div>
       </div>
     );
-  },
-  (prevProps, nextProps) => prevProps.cat._id === nextProps.cat._id,
-);
+}
 
 export default CategoryProduct;

@@ -18,34 +18,27 @@ const CartItem = React.memo(
      *
      */
     const handleIncreaseQuantity = async () => {
-      // Check if productId is an object (populated) or string
       const productId = item?.productId?._id || item?.productId || item?.id;
-
       await dispatch(
         updateCartQuantityAPI({
           productId,
           quantity: (item.quantity || 1) + 1,
+          variants: item.variants ? (item.variants.map(v => v._id || v)) : [],
+          productDetails: item.productId // Pass details for better merging
         }),
       );
-      // Removed redundant fetchCartAPI()
     };
 
-    /**
-     *
-     * DECREASING QUANTITY
-     * ==========================
-     *
-     */
     const handleDecreaseQuantity = async () => {
       const productId = item?.productId?._id || item?.productId || item?.id;
-
       await dispatch(
         updateCartQuantityAPI({
           productId,
           quantity: String((item.quantity || 1) - 1),
+          variants: item.variants ? (item.variants.map(v => v._id || v)) : [],
+          productDetails: item.productId
         }),
       );
-      // Removed redundant fetchCartAPI()
     };
 
     /**
@@ -87,7 +80,9 @@ const CartItem = React.memo(
           <div className="flex items-center justify-between">
             <div>
               <h2 className="font-semibold">{item?.productId?.name}</h2>
-              <p className="text-sm text-gray-500">Size: {item?.productId?.size}</p>
+               <p className="text-sm text-gray-500 font-bold uppercase">
+                  Unit: {item.variants?.[0]?.unit || item?.productId?.unit || 'N/A'}
+                </p>
               <p className="text-sm text-gray-500">Seller: {item?.productId?.seller}</p>
               <p className="flex gap-5 text-green-600 font-bold">
                 ₹{item.price ?? 330} <span className="line-through text-gray-400 text-sm">₹{item?.productId?.originalPrice}</span>{' '}

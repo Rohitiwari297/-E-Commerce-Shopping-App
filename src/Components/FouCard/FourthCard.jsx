@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getProductDetsils } from '../../redux/features/product/productSlice.js';
 import { addToCartAPI, clearCartAPI, fetchCartAPI, updateCartQuantityAPI } from '../../redux/features/cart/cartSlice.js';
 import { getGuestCart, setGuestCart } from '../../utils/guestCart.js';
+import { Link } from 'react-router-dom';
 
 function FourthCard() {
   const baseUrl = import.meta.env.VITE_BASE_URL?.replace(/\/$/, '');
@@ -30,21 +31,45 @@ function FourthCard() {
   const cartItems = useSelector((state) => state.addToCartData?.items) || [];
   console.log('cartItems', cartItems);
 
-  // OPTIMIZATION: Select ONLY the quantity for this specific product.
-  // This ensures the component ONLY re-renders if THIS product's quantity changes.
-  const getItemQuantity = (productOrId) => {
-    const id = productOrId?._id || productOrId;
+  // State to track selected variant for each product
+  const [selectedVariants, setSelectedVariants] = React.useState({});
 
-    // If user is logged in, read quantity from redux cart
+  const handleVariantChange = (productId, variantId) => {
+    setSelectedVariants((prev) => ({
+      ...prev,
+      [productId]: variantId,
+    }));
+  };
+
+  // OPTIMIZATION: Select ONLY the quantity for this specific product.
+  const getItemQuantity = (productOrId) => {
+    const id = String(productOrId?._id || productOrId);
+    const variants = productOrId?.variants || [];
+    const selectedVariantId = selectedVariants[id] || (variants.length > 0 ? variants[0]._id : null);
+
     if (user) {
-      const foundItem = cartItems.find((i) => i?.productId?._id === id);
+      const foundItem = cartItems.find((i) => {
+        const itemProdId = String(i?.productId?._id || i?.productId);
+        if (itemProdId !== id) return false;
+        
+        if (selectedVariantId && i.variants && i.variants.length > 0) {
+          return i.variants.some(v => String(v?._id || v) === String(selectedVariantId));
+        }
+        
+        return true;
+      });
       return Number(foundItem?.quantity || 0);
     }
 
-    // If guest, read quantity from localStorage guest cart
     try {
-      const guest = getGuestCart();
-      const found = guest.find((i) => i?._id === id);
+      const guest = getGuestCart() || [];
+      const found = guest.find((i) => {
+        if (String(i?._id) !== id) return false;
+        if (selectedVariantId) {
+          return String(i.selectedVariantId) === String(selectedVariantId);
+        }
+        return !i.selectedVariantId;
+      });
       return Number(found?.quantity || 0);
     } catch (err) {
       return 0;
@@ -58,13 +83,15 @@ function FourthCard() {
 
   // Addition and removal handlers
   const handleAddItems = async (item) => {
+    const selectedVariantId = selectedVariants[item._id] || (item?.variants?.length > 0 ? item.variants[0]._id : null);
     if (!user) {
       const cart = getGuestCart();
-      const existing = cart.find((i) => i._id === item._id);
+      const existing = cart.find((i) => String(i._id) === String(item._id) && (!selectedVariantId || String(i.selectedVariantId) === String(selectedVariantId)));
 
       if (existing) {
         existing.quantity += 1;
         setGuestCart(cart);
+        refreshGuestCart();
       }
       return;
     }
@@ -73,24 +100,29 @@ function FourthCard() {
       updateCartQuantityAPI({
         productId: item._id,
         quantity: getItemQuantity(item) + 1,
+        variants: selectedVariantId ? [selectedVariantId] : [],
+        productDetails: item
       }),
     );
+    dispatch(fetchCartAPI());
   };
 
   const handleDeleteItems = async (item) => {
+    const selectedVariantId = selectedVariants[item._id] || (item?.variants?.length > 0 ? item.variants[0]._id : null);
     if (!user) {
       let cart = getGuestCart();
-      const existing = cart.find((i) => i._id === item._id);
+      const existing = cart.find((i) => String(i._id) === String(item._id) && (!selectedVariantId || String(i.selectedVariantId) === String(selectedVariantId)));
 
       if (!existing) return;
 
       if (existing.quantity <= 1) {
-        cart = cart.filter((i) => i._id !== item._id);
+        cart = cart.filter((i) => !(String(i._id) === String(item._id) && (!selectedVariantId || String(i.selectedVariantId) === String(selectedVariantId))));
       } else {
         existing.quantity -= 1;
       }
 
       setGuestCart(cart);
+      refreshGuestCart();
       return;
     }
 
@@ -106,22 +138,27 @@ function FourthCard() {
       updateCartQuantityAPI({
         productId: item._id,
         quantity: currentQty - 1,
+        variants: selectedVariantId ? [selectedVariantId] : [],
+        productDetails: item
       }),
     );
+    dispatch(fetchCartAPI());
   };
 
   const handleAddToCart = async (item) => {
+    const selectedVariantId = selectedVariants[item._id] || (item?.variants?.length > 0 ? item.variants[0]._id : null);
     if (!user) {
       const cart = getGuestCart();
-      const existing = cart.find((i) => i._id === item._id);
+      const existing = cart.find((i) => String(i._id) === String(item._id) && (!selectedVariantId || String(i.selectedVariantId) === String(selectedVariantId)));
 
       if (existing) {
         existing.quantity += 1;
       } else {
-        cart.push({ ...item, quantity: 1 });
+        cart.push({ ...item, quantity: 1, selectedVariantId });
       }
 
       setGuestCart(cart);
+      refreshGuestCart();
       return;
     }
 
@@ -129,6 +166,8 @@ function FourthCard() {
       addToCartAPI({
         productId: item._id,
         quantity: 1,
+        variants: selectedVariantId ? [selectedVariantId] : [],
+        productDetails: item
       }),
     );
 
@@ -186,15 +225,17 @@ function FourthCard() {
                         {/* Image Container */}
                         <div className="relative h-32 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden group-hover:opacity-95 transition-opacity">
                           {imageUrl ? (
-                            <img
-                              src={imageUrl}
-                              alt={product.name}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                              onError={(e) => {
-                                e.target.style.display = 'none';
-                                e.target.nextSibling.style.display = 'flex';
-                              }}
-                            />
+                            <Link to={`/category/itemDetails`} state={{ homeProduct: product }}>
+                              <img
+                                src={imageUrl}
+                                alt={product.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                onError={(e) => {
+                                  e.target.style.display = 'none';
+                                  e.target.nextSibling.style.display = 'flex';
+                                }}
+                              />
+                            </Link>
                           ) : null}
                           <div
                             className="w-full h-full bg-gray-100 flex items-center justify-center text-xs text-gray-400"
@@ -214,13 +255,45 @@ function FourthCard() {
                             <p className="text-xs text-gray-500 line-clamp-1">{truncateDesc(product.description, 50)}</p>
                           )}
 
-                          {/* Price & Unit */}
-                          <div className="flex items-center justify-between mt-auto pt-2">
-                            <div className="flex gap-1 items-center">
-                              <p className="text-sm font-bold text-green-600">₹{product.currentPrice || '0'}</p>
-                              {product.originalPrice && <p className="text-xs line-through text-gray-400">₹{product.originalPrice}</p>}
+                          {/* Price & Variant Selection */}
+                          <div className="flex flex-col gap-2 mt-auto pt-2">
+                            <div className="flex items-center justify-between gap-2">
+                              {/* Price */}
+                              <div className="flex flex-col">
+                                <p className="text-sm font-bold text-green-600">
+                                  ₹{product?.variants?.find(v => v._id === (selectedVariants[product._id] || product.variants[0]._id))?.price || product.currentPrice || '0'}
+                                </p>
+                                {product.originalPrice && <p className="text-[10px] line-through text-gray-400 leading-none">₹{product.originalPrice}</p>}
+                              </div>
+
+                              {/* Variant Dropdown */}
+                              {product?.variants?.length > 0 && (
+                                <div className="flex flex-col items-end gap-1">
+                                  <div className="relative min-w-[80px]">
+                                    <select
+                                      value={selectedVariants[product._id] || product.variants[0]._id}
+                                      onChange={(e) => handleVariantChange(product._id, e.target.value)}
+                                      className="w-full text-[11px] font-medium bg-gray-50 border border-gray-200 rounded px-2 py-1 outline-none focus:border-green-500 appearance-none cursor-pointer pr-5 hover:bg-white transition-colors"
+                                    >
+                                      {product.variants.map((variant) => (
+                                        <option key={variant._id} value={variant._id}>
+                                          {variant.unit}
+                                        </option>
+                                      ))}
+                                    </select>
+                                    <div className="absolute inset-y-0 right-0 flex items-center pr-1.5 pointer-events-none text-gray-400">
+                                      <svg className="w-3 h-3 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" /></svg>
+                                    </div>
+                                  </div>
+                                  {/* Stock Indicator */}
+                                  <span className={`text-[10px] font-medium ${(product?.variants?.find(v => v._id === (selectedVariants[product._id] || product.variants[0]._id))?.stock || 0) > 0 ? 'text-gray-400' : 'text-red-500'}`}>
+                                    {(product?.variants?.find(v => v._id === (selectedVariants[product._id] || product.variants[0]._id))?.stock || 0) > 0 
+                                      ? `Stock: ${product?.variants?.find(v => v._id === (selectedVariants[product._id] || product.variants[0]._id))?.stock}` 
+                                      : 'Out of Stock'}
+                                  </span>
+                                </div>
+                              )}
                             </div>
-                            {product.unit && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">{product.unit}</span>}
                           </div>
                         </div>
 
@@ -249,7 +322,8 @@ function FourthCard() {
                                     handleAddItems(product);
                                     if (!user) refreshGuestCart();
                                   }}
-                                  className="w-8 h-8 flex items-center justify-center text-green-600 hover:bg-green-50 transition active:scale-90"
+                                  disabled={(product?.variants?.find(v => v._id === (selectedVariants[product._id] || product.variants[0]._id))?.stock || 0) <= qty}
+                                  className={`w-8 h-8 flex items-center justify-center text-green-600 hover:bg-green-50 transition active:scale-90 disabled:opacity-30 disabled:cursor-not-allowed`}
                                 >
                                   +
                                 </button>
@@ -264,10 +338,11 @@ function FourthCard() {
                                 handleAddToCart(product);
                                 if (!user) refreshGuestCart();
                               }}
-                              className={`w-full px-3 py-2 text-sm font-semibold rounded-md transition duration-200 shadow-sm active:scale-95
-        ${user ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white'}`}
+                              disabled={(product?.variants?.find(v => v._id === (selectedVariants[product._id] || product.variants[0]._id))?.stock || 0) === 0}
+                              className={`w-full px-3 py-2 text-sm font-semibold rounded-md transition duration-200 shadow-sm active:scale-95 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed
+                                ${user ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white'}`}
                             >
-                              {'Add to Cart'}
+                              {(product?.variants?.find(v => v._id === (selectedVariants[product._id] || product.variants[0]._id))?.stock || 0) === 0 ? 'Out of Stock' : 'Add to Cart'}
                             </button>
                           )}
                         </div>

@@ -1,28 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import img1 from "../assets/makha.png";
-import img2 from "../assets/chal.png";
-import img3 from "../assets/namk.png";
+import { useNavigate, useLocation } from "react-router-dom";
+
 
 //invoice download
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import logo from "../assets/hel.png"; //  use store logo here
 
-import { MapPin, LogOut, ShoppingBag, Settings, User, Bell, Mail, Lock, Target } from "lucide-react";
+import { MapPin, LogOut, ShoppingBag, Settings as SettingsIcon, User } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import DeliveryPage from "./DeliveryPage";
 import AddressModalPage from "./AddressModalPage";
-import { GiRamProfile } from "react-icons/gi";
 import Profile from "./Profile";
+import Settings from './Settings'
 import { getUserDetails } from "../redux/features/user/userSlice";
 
-
-const statusColor = {
-  Delivered: "text-green-600 bg-green-100",
-  "In Transit": "text-blue-600 bg-blue-100",
-  Cancelled: "text-red-600 bg-red-100",
-};
 
 // Handle Invoice Download
 const handleInvoice = (order) => {
@@ -113,21 +105,11 @@ const handleInvoice = (order) => {
 function DeliveryHistory() {
   
   const navigate = useNavigate();
+  const location = useLocation();
 
   // state for selected menu
   const [menu, setMenu] = useState("orders");
 
-  // state for settings toggle
-  const [settings, setSettings] = useState({
-    pushNotifications: true,
-    emailAlerts: false,
-    accountPrivacy: true,
-    twoFactorAuth: false,
-  });
-
-  const handleSettingToggle = (id) => {
-    setSettings(prev => ({ ...prev, [id]: !prev[id] }));
-  };
 
   // Get user details from store
   const user = useSelector((state) => state.auth.user);
@@ -157,16 +139,23 @@ function DeliveryHistory() {
 
   useEffect(() => {
     dispatch(getUserDetails(user._id));
-  }, [user._id]);
+    
+    // Check if a specific menu was requested via navigate state
+    if (location.state?.menu) {
+      setMenu(location.state.menu);
+      // Optional: clear the state to prevent re-applying on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [user._id, location.state]);
 
   console.log("user data", userData);
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col md:flex-row">
       {/* Sidebar / Top Menu */}
-      <aside className="bg-white md:w-72 shadow-xl shadow-gray-200/50 md:sticky md:top-20 md:h-[calc(100vh-80px)] z-10 transition-all duration-300">
+      <aside className="bg-white md:w-72 shadow-xl shadow-gray-200/50 md:sticky md:top-20 md:h-[calc(100vh-80px)] z-10 transition-all duration-300 flex flex-col">
         {/* User Info Card */}
-        <div className="p-6 border-b border-gray-100 mb-2">
+        <div className="p-6 border-b border-gray-100">
           <div className="flex flex-col items-center">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-green-600 mb-3 border-4 border-green-50">
               <User size={32} />
@@ -180,31 +169,34 @@ function DeliveryHistory() {
           </div>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible p-3 md:p-4 text-sm no-scrollbar">
-          {[
-            { id: 'orders', label: 'My Orders', icon: <ShoppingBag size={20} /> },
-            { id: 'address', label: 'My Addresses', icon: <MapPin size={20} /> },
-            { id: 'profile', label: 'My Profile', icon: <User size={20} /> },
-            { id: 'settings', label: 'Settings', icon: <Settings size={20} /> },
-          ].map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setMenu(item.id)}
-              className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-200 whitespace-nowrap font-bold group
-                ${menu === item.id 
-                  ? "bg-green-600 text-white shadow-lg shadow-green-200" 
-                  : "text-gray-500 hover:bg-gray-50 hover:text-green-600"
-                }`}
-            >
-              <span className={`${menu === item.id ? "text-white" : "text-gray-400 group-hover:text-green-600"}`}>
-                {item.icon}
-              </span>
-              {item.label}
-            </button>
-          ))}
+        {/* Navigation Wrapper */}
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          <nav className="flex md:flex-col gap-1 overflow-x-auto md:overflow-y-auto p-3 md:p-4 text-sm no-scrollbar flex-1">
+            {[
+              { id: 'orders', label: 'My Orders', icon: <ShoppingBag size={20} /> },
+              { id: 'address', label: 'My Addresses', icon: <MapPin size={20} /> },
+              { id: 'profile', label: 'My Profile', icon: <User size={20} /> },
+              { id: 'settings', label: 'Settings', icon: <SettingsIcon size={20} /> },
+            ].map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setMenu(item.id)}
+                className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-200 whitespace-nowrap font-bold group
+                  ${menu === item.id 
+                    ? "bg-green-600 text-white shadow-lg shadow-green-200" 
+                    : "text-gray-500 hover:bg-gray-50 hover:text-green-600"
+                  }`}
+              >
+                <span className={`${menu === item.id ? "text-white" : "text-gray-400 group-hover:text-green-600"}`}>
+                  {item.icon}
+                </span>
+                {item.label}
+              </button>
+            ))}
+          </nav>
 
-          <div className="md:mt-6 md:pt-6 md:border-t border-gray-100 px-1">
+          {/* Logout Section - Fixed at bottom on desktop */}
+          <div className="p-3 md:p-4 border-t border-gray-100 bg-white">
             <button
               onClick={() => navigate('/')}
               className="flex items-center gap-3 px-4 py-3.5 rounded-2xl text-red-600 font-bold bg-red-50/50 hover:bg-red-50 transition-all w-full group whitespace-nowrap"
@@ -213,7 +205,7 @@ function DeliveryHistory() {
               Logout
             </button>
           </div>
-        </nav>
+        </div>
       </aside>
 
       {/* Main Content */}
@@ -228,53 +220,7 @@ function DeliveryHistory() {
             </div>
           )}
 
-          {menu === "settings" && (
-            <div className="space-y-8 animate-fadeIn">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-2">
-                <div>
-                  <h2 className="text-2xl font-black text-gray-800">Account Settings</h2>
-                  <p className="text-gray-400 font-medium text-sm mt-1">Manage your app experience and security</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[
-                  { id: 'pushNotifications', title: 'Push Notifications', desc: 'Receive real-time order updates', icon: <Bell size={20} /> },
-                  { id: 'emailAlerts', title: 'Email Alerts', desc: 'Product news and exclusive offers', icon: <Mail size={20} /> },
-                  { id: 'accountPrivacy', title: 'Account Privacy', desc: 'Manage your data visibility', icon: <Lock size={20} /> },
-                  { id: 'twoFactorAuth', title: 'Two-Factor Auth', desc: 'Secure your account with 2FA', icon: <Target size={20} /> },
-                ].map((s) => (
-                  <div key={s.id} className="p-6 rounded-3xl bg-white border border-gray-100 shadow-sm flex items-center justify-between group hover:border-green-600/30 transition-all">
-                    <div className="flex items-center gap-4">
-                      <div className={`p-3 rounded-2xl ${settings[s.id] ? 'bg-green-50 text-green-600' : 'bg-gray-50 text-gray-400'} transition-colors`}>
-                        {s.icon}
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-gray-800 text-[15px]">{s.title}</h4>
-                        <p className="text-gray-400 text-xs font-medium">{s.desc}</p>
-                      </div>
-                    </div>
-                    <div 
-                      className={`w-12 h-6 rounded-full relative cursor-pointer transition-all duration-300 ${settings[s.id] ? 'bg-green-600' : 'bg-gray-200'}`}
-                      onClick={() => handleSettingToggle(s.id)}
-                    >
-                      <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all duration-300 ${settings[s.id] ? 'left-7' : 'left-1'}`}></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="p-6 rounded-3xl bg-red-50 border border-red-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="text-center sm:text-left">
-                  <h4 className="font-black text-red-800">Danger Zone</h4>
-                  <p className="text-sm text-red-700/60 font-medium">Temporarily disable or permanently delete your account</p>
-                </div>
-                <button className="px-6 py-2.5 bg-white text-red-600 font-black text-xs uppercase tracking-widest rounded-xl shadow-sm hover:shadow-md transition-all">
-                  Request Deletion
-                </button>
-              </div>
-            </div>
-          )}
+          {menu === "settings" && <Settings />}
 
           {menu === "profile" && <Profile />}
         </div>
