@@ -71,7 +71,8 @@ function CartPage() {
 
   // total discount (safe for both shapes)
   const totalDiscount = (displayItems || []).reduce((acc, i) => {
-    const orig = i?.productId?.originalPrice ?? i.originalPrice ?? 0;
+    const variant = i?.variants?.[0] || i?.productId?.variants?.find(v => v._id === i.variantId) || (i.selectedVariantId ? i.variants?.find(v => v._id === i.selectedVariantId) : null);
+    const orig = variant?.originalPrice || i?.productId?.originalPrice || i.originalPrice || 0;
     return acc + (orig || 0) * (i.quantity || 1);
   }, 0);
   console.log('totalDiscount', totalDiscount);

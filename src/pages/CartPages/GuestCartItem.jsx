@@ -49,14 +49,29 @@ function GuestCartItem({ item, onChange }) {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col justify-between">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="font-semibold">{item?.name || item?.productId?.name}</h2>
-            <p className="text-sm text-gray-500">Qty: {item.quantity ?? 1}</p>
-            <p className="flex gap-5 text-green-600 font-bold">₹{item.currentPrice ?? item.price ?? 0}</p>
+        <div className="flex-1 flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-semibold">{item?.name || item?.productId?.name}</h2>
+              {(() => {
+                const variants = item?.variants || item?.productId?.variants || [];
+                const selectedVariant = variants.find(v => String(v._id) === String(item.selectedVariantId));
+                return selectedVariant ? (
+                  <p className="text-sm text-gray-500 font-bold uppercase">Unit: {selectedVariant.unit}</p>
+                ) : item.unit || item.productId?.unit ? (
+                  <p className="text-sm text-gray-500 font-bold uppercase">Unit: {item.unit || item.productId?.unit}</p>
+                ) : null;
+              })()}
+              <p className="text-sm text-gray-500">Qty: {item.quantity ?? 1}</p>
+              <p className="flex gap-5 text-green-600 font-bold">
+                ₹{(() => {
+                  const variants = item?.variants || item?.productId?.variants || [];
+                  const selectedVariant = variants.find(v => String(v._id) === String(item.selectedVariantId));
+                  return selectedVariant?.currentPrice || item.currentPrice || item.price || 0;
+                })()}
+              </p>
+            </div>
           </div>
-        </div>
 
         <div className="flex items-center gap-4 mt-2">
           <button className="text-blue-600 hover:underline text-sm" onClick={removeItem}>

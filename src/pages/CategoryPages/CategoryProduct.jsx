@@ -70,7 +70,7 @@ function CategoryProduct({ cat }) {
           productId: product._id,
           quantity: 1,
           productDetails: product, // Pass full details for optimistic/manual population
-          variants: selectedVariantId ? [selectedVariantId] : [],
+          variantId: selectedVariantId,
         }),
       );
     };
@@ -90,7 +90,7 @@ function CategoryProduct({ cat }) {
         updateCartQuantityAPI({
           productId: product._id,
           quantity: quantity + 1,
-          variants: selectedVariantId ? [selectedVariantId] : [],
+          variantId: selectedVariantId,
           productDetails: product,
         }),
       );
@@ -121,7 +121,7 @@ function CategoryProduct({ cat }) {
         updateCartQuantityAPI({
           productId: item._id,
           quantity: quantity - 1,
-          variants: selectedVariantId ? [selectedVariantId] : [],
+          variantId: selectedVariantId,
           productDetails: cat,
         }),
       );
@@ -154,14 +154,24 @@ function CategoryProduct({ cat }) {
                 {/* Price */}
                 <div className="flex flex-col">
                   <p className="text-sm font-bold text-green-600">
-                    ₹{cat.variants?.find((v) => v._id === selectedVariantId)?.price || cat.currentPrice}
+                    ₹{cat.variants?.find((v) => v._id === selectedVariantId)?.currentPrice || cat.currentPrice}
                   </p>
-                  {cat.originalPrice && <p className="text-[10px] line-through text-gray-400 leading-none">₹{cat.originalPrice}</p>}
+                  {cat.variants?.find((v) => v._id === selectedVariantId)?.originalPrice || cat.originalPrice ? (
+                    <p className="text-[10px] line-through text-gray-400 leading-none">
+                      ₹{cat.variants?.find((v) => v._id === selectedVariantId)?.originalPrice || cat.originalPrice}
+                    </p>
+                  ) : null}
                 </div>
 
                 {/* Variant Dropdown */}
                 {cat.variants?.length > 0 && (
-                  <div className="flex flex-col items-end gap-1">
+                  <div 
+                    className="flex flex-col items-end gap-1"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                  >
                     <div className="relative min-w-[80px]">
                       <select
                         value={selectedVariantId}
@@ -170,7 +180,7 @@ function CategoryProduct({ cat }) {
                       >
                         {cat.variants.map((v) => (
                           <option key={v._id} value={v._id}>
-                            {v.unit}
+                           {v.unit}
                           </option>
                         ))}
                       </select>

@@ -19,11 +19,12 @@ const CartItem = React.memo(
      */
     const handleIncreaseQuantity = async () => {
       const productId = item?.productId?._id || item?.productId || item?.id;
+      const variantId = item.variants?.[0]?._id || item.variantId;
       await dispatch(
         updateCartQuantityAPI({
           productId,
           quantity: (item.quantity || 1) + 1,
-          variants: item.variants ? (item.variants.map(v => v._id || v)) : [],
+          variantId,
           productDetails: item.productId // Pass details for better merging
         }),
       );
@@ -31,11 +32,12 @@ const CartItem = React.memo(
 
     const handleDecreaseQuantity = async () => {
       const productId = item?.productId?._id || item?.productId || item?.id;
+      const variantId = item.variants?.[0]?._id || item.variantId;
       await dispatch(
         updateCartQuantityAPI({
           productId,
           quantity: String((item.quantity || 1) - 1),
-          variants: item.variants ? (item.variants.map(v => v._id || v)) : [],
+          variantId,
           productDetails: item.productId
         }),
       );
@@ -81,11 +83,19 @@ const CartItem = React.memo(
             <div>
               <h2 className="font-semibold">{item?.productId?.name}</h2>
                <p className="text-sm text-gray-500 font-bold uppercase">
-                  Unit: {item.variants?.[0]?.unit || item?.productId?.unit || 'N/A'}
+                  Unit: {item.unit  || 'N/A'}
+                  {console.log("itemmmmmmmmm", item)}
                 </p>
               <p className="text-sm text-gray-500">Seller: {item?.productId?.seller}</p>
               <p className="flex gap-5 text-green-600 font-bold">
-                ₹{item.price ?? 330} <span className="line-through text-gray-400 text-sm">₹{item?.productId?.originalPrice}</span>{' '}
+                ₹{item.price ?? 0}{' '}
+                {(() => {
+                  const variant = item.variants?.[0] || item.productId?.variants?.find(v => v._id === item.variantId);
+                  const originalPrice = variant?.originalPrice || item.productId?.originalPrice;
+                  return originalPrice ? (
+                    <span className="line-through text-gray-400 text-sm">₹{originalPrice}</span>
+                  ) : null;
+                })()}
               </p>
               <p className="text-sm text-gray-500">Delivery by {item.delivery ?? 'Thu Oct 9'}</p>
             </div>

@@ -74,7 +74,7 @@ function ProductDetailing() {
       addToCartAPI({
         productId: catData._id,
         quantity: 1,
-        variants: selectedVariantId ? [selectedVariantId] : [],
+        variantId: selectedVariantId,
         productDetails: catData, // Pass details for immediate UI update
       })
     );
@@ -152,7 +152,7 @@ function ProductDetailing() {
       updateCartQuantityAPI({
         productId: catData._id,
         quantity: String(newQty),
-        variants: selectedVariantId ? [selectedVariantId] : [],
+        variantId: selectedVariantId,
         productDetails: catData,
       })
     );
@@ -196,7 +196,7 @@ function ProductDetailing() {
         updateCartQuantityAPI({
           productId: catData._id,
           quantity: String(newQty),
-          variants: selectedVariantId ? [selectedVariantId] : [],
+          variantId: selectedVariantId,
           productDetails: catData,
         })
       );
@@ -309,16 +309,28 @@ function ProductDetailing() {
                       <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Our Price</span>
                       <div className="flex items-center gap-2.5">
                         <p className="text-3xl font-black text-green-600">
-                          ₹{catData.variants?.find(v => v._id === selectedVariantId)?.price || catData.currentPrice}
+                          ₹{catData.variants?.find(v => v._id === selectedVariantId)?.currentPrice || catData.currentPrice}
                         </p>
-                        {catData.originalPrice && (
-                          <div className="flex flex-col">
-                            <p className="text-sm line-through text-gray-400 decoration-red-400/40">
-                              ₹{catData.originalPrice}
-                            </p>
-                            <span className="text-[9px] font-black text-orange-500">Save ₹{catData.originalPrice - (catData.variants?.find(v => v._id === selectedVariantId)?.price || catData.currentPrice)}</span>
-                          </div>
-                        )}
+                        {(() => {
+                          const selectedVariant = catData.variants?.find(v => v._id === selectedVariantId);
+                          const currentOriginalPrice = selectedVariant?.originalPrice || catData.originalPrice;
+                          const currentPrice = selectedVariant?.currentPrice || catData.currentPrice;
+                          
+                          if (!currentOriginalPrice) return null;
+                          
+                          return (
+                            <div className="flex flex-col">
+                              <p className="text-sm line-through text-gray-400 decoration-red-400/40">
+                                ₹{currentOriginalPrice}
+                              </p>
+                              {currentOriginalPrice > currentPrice && (
+                                <span className="text-[9px] font-black text-orange-500">
+                                  Save ₹{currentOriginalPrice - currentPrice}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
 

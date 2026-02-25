@@ -112,7 +112,7 @@ import axios from "axios";
 /* ================= ADD TO CART ================= */
 export const addToCartAPI = createAsyncThunk(
   "cart/add",
-  async ({ productId, quantity, variants }, { rejectWithValue }) => {
+  async ({ productId, quantity, variantId }, { rejectWithValue }) => {
     try {
 
       const token = localStorage.getItem("token")
@@ -120,8 +120,8 @@ export const addToCartAPI = createAsyncThunk(
         `${import.meta.env.VITE_BASE_URL}api/cart/add`,
         {
           productId,
-          quantity,
-          variants
+          quantity: String(quantity),
+          variantId
         },
         {
           headers: {
@@ -139,8 +139,8 @@ export const addToCartAPI = createAsyncThunk(
 /* ================= REMOVE FROM CART QUANTITY ================= */
 export const updateCartQuantityAPI = createAsyncThunk(
   "cart/update",
-  async ({ productId, quantity, variants }, { rejectWithValue }) => {
-    console.log('productId:', productId, "quantity:", quantity, "variants:", variants)
+  async ({ productId, quantity, variantId }, { rejectWithValue }) => {
+    console.log('productId:', productId, "quantity:", quantity, "variantId:", variantId)
     try {
       const token = localStorage.getItem("token")
       const res = await axios.patch(
@@ -148,7 +148,7 @@ export const updateCartQuantityAPI = createAsyncThunk(
         {
           productId,
           quantity: String(quantity),
-          variants
+          variantId
         },
         {
           headers: {

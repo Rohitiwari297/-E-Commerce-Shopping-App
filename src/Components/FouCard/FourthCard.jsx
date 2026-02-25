@@ -51,11 +51,11 @@ function FourthCard() {
       const foundItem = cartItems.find((i) => {
         const itemProdId = String(i?.productId?._id || i?.productId);
         if (itemProdId !== id) return false;
-        
+
         if (selectedVariantId && i.variants && i.variants.length > 0) {
-          return i.variants.some(v => String(v?._id || v) === String(selectedVariantId));
+          return i.variants.some((v) => String(v?._id || v) === String(selectedVariantId));
         }
-        
+
         return true;
       });
       return Number(foundItem?.quantity || 0);
@@ -86,7 +86,9 @@ function FourthCard() {
     const selectedVariantId = selectedVariants[item._id] || (item?.variants?.length > 0 ? item.variants[0]._id : null);
     if (!user) {
       const cart = getGuestCart();
-      const existing = cart.find((i) => String(i._id) === String(item._id) && (!selectedVariantId || String(i.selectedVariantId) === String(selectedVariantId)));
+      const existing = cart.find(
+        (i) => String(i._id) === String(item._id) && (!selectedVariantId || String(i.selectedVariantId) === String(selectedVariantId)),
+      );
 
       if (existing) {
         existing.quantity += 1;
@@ -100,8 +102,8 @@ function FourthCard() {
       updateCartQuantityAPI({
         productId: item._id,
         quantity: getItemQuantity(item) + 1,
-        variants: selectedVariantId ? [selectedVariantId] : [],
-        productDetails: item
+        variantId: selectedVariantId,
+        productDetails: item,
       }),
     );
     dispatch(fetchCartAPI());
@@ -111,12 +113,16 @@ function FourthCard() {
     const selectedVariantId = selectedVariants[item._id] || (item?.variants?.length > 0 ? item.variants[0]._id : null);
     if (!user) {
       let cart = getGuestCart();
-      const existing = cart.find((i) => String(i._id) === String(item._id) && (!selectedVariantId || String(i.selectedVariantId) === String(selectedVariantId)));
+      const existing = cart.find(
+        (i) => String(i._id) === String(item._id) && (!selectedVariantId || String(i.selectedVariantId) === String(selectedVariantId)),
+      );
 
       if (!existing) return;
 
       if (existing.quantity <= 1) {
-        cart = cart.filter((i) => !(String(i._id) === String(item._id) && (!selectedVariantId || String(i.selectedVariantId) === String(selectedVariantId))));
+        cart = cart.filter(
+          (i) => !(String(i._id) === String(item._id) && (!selectedVariantId || String(i.selectedVariantId) === String(selectedVariantId))),
+        );
       } else {
         existing.quantity -= 1;
       }
@@ -138,23 +144,29 @@ function FourthCard() {
       updateCartQuantityAPI({
         productId: item._id,
         quantity: currentQty - 1,
-        variants: selectedVariantId ? [selectedVariantId] : [],
-        productDetails: item
+        variantId: selectedVariantId,
+        productDetails: item,
       }),
     );
     dispatch(fetchCartAPI());
   };
 
-  const handleAddToCart = async (item) => {
-    const selectedVariantId = selectedVariants[item._id] || (item?.variants?.length > 0 ? item.variants[0]._id : null);
+  const handleAddToCart = async (item, variantId) => {
+    console.log('item', item);
+    console.log('variantId', variantId);
     if (!user) {
       const cart = getGuestCart();
-      const existing = cart.find((i) => String(i._id) === String(item._id) && (!selectedVariantId || String(i.selectedVariantId) === String(selectedVariantId)));
+
+      const existing = cart.find((i) => String(i._id) === String(item._id) && String(i.selectedVariantId) === String(variantId));
 
       if (existing) {
         existing.quantity += 1;
       } else {
-        cart.push({ ...item, quantity: 1, selectedVariantId });
+        cart.push({
+          ...item,
+          quantity: 1,
+          selectedVariantId: variantId,
+        });
       }
 
       setGuestCart(cart);
@@ -166,8 +178,7 @@ function FourthCard() {
       addToCartAPI({
         productId: item._id,
         quantity: 1,
-        variants: selectedVariantId ? [selectedVariantId] : [],
-        productDetails: item
+        variantId: variantId, // ✅ DIRECTLY sending
       }),
     );
 
@@ -261,9 +272,20 @@ function FourthCard() {
                               {/* Price */}
                               <div className="flex flex-col">
                                 <p className="text-sm font-bold text-green-600">
-                                  ₹{product?.variants?.find(v => v._id === (selectedVariants[product._id] || product.variants[0]._id))?.price || product.currentPrice || '0'}
+                                  ₹
+                                  {product?.variants?.find((v) => v._id === (selectedVariants[product._id] || product.variants[0]._id))
+                                    ?.currentPrice ||
+                                    product.currentPrice ||
+                                    '0'}
                                 </p>
-                                {product.originalPrice && <p className="text-[10px] line-through text-gray-400 leading-none">₹{product.originalPrice}</p>}
+                                {product?.variants?.find((v) => v._id === (selectedVariants[product._id] || product.variants[0]._id))
+                                  ?.originalPrice ||
+                                  product.originalPrice ? (
+                                    <p className="text-[10px] line-through text-gray-400 leading-none">
+                                      ₹{product?.variants?.find((v) => v._id === (selectedVariants[product._id] || product.variants[0]._id))
+                                        ?.originalPrice || product.originalPrice}
+                                    </p>
+                                  ) : null}
                               </div>
 
                               {/* Variant Dropdown */}
@@ -278,17 +300,23 @@ function FourthCard() {
                                       {product.variants.map((variant) => (
                                         <option key={variant._id} value={variant._id}>
                                           {variant.unit}
+                                          {/* {console.log('verrrrriant',variant.unit)} */}
                                         </option>
                                       ))}
                                     </select>
                                     <div className="absolute inset-y-0 right-0 flex items-center pr-1.5 pointer-events-none text-gray-400">
-                                      <svg className="w-3 h-3 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" /></svg>
+                                      <svg className="w-3 h-3 fill-current" viewBox="0 0 20 20">
+                                        <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                      </svg>
                                     </div>
                                   </div>
                                   {/* Stock Indicator */}
-                                  <span className={`text-[10px] font-medium ${(product?.variants?.find(v => v._id === (selectedVariants[product._id] || product.variants[0]._id))?.stock || 0) > 0 ? 'text-gray-400' : 'text-red-500'}`}>
-                                    {(product?.variants?.find(v => v._id === (selectedVariants[product._id] || product.variants[0]._id))?.stock || 0) > 0 
-                                      ? `Stock: ${product?.variants?.find(v => v._id === (selectedVariants[product._id] || product.variants[0]._id))?.stock}` 
+                                  <span
+                                    className={`text-[10px] font-medium ${(product?.variants?.find((v) => v._id === (selectedVariants[product._id] || product.variants[0]._id))?.stock || 0) > 0 ? 'text-gray-400' : 'text-red-500'}`}
+                                  >
+                                    {(product?.variants?.find((v) => v._id === (selectedVariants[product._id] || product.variants[0]._id))
+                                      ?.stock || 0) > 0
+                                      ? `Stock: ${product?.variants?.find((v) => v._id === (selectedVariants[product._id] || product.variants[0]._id))?.stock}`
                                       : 'Out of Stock'}
                                   </span>
                                 </div>
@@ -322,7 +350,10 @@ function FourthCard() {
                                     handleAddItems(product);
                                     if (!user) refreshGuestCart();
                                   }}
-                                  disabled={(product?.variants?.find(v => v._id === (selectedVariants[product._id] || product.variants[0]._id))?.stock || 0) <= qty}
+                                  disabled={
+                                    (product?.variants?.find((v) => v._id === (selectedVariants[product._id] || product.variants[0]._id))
+                                      ?.stock || 0) <= qty
+                                  }
                                   className={`w-8 h-8 flex items-center justify-center text-green-600 hover:bg-green-50 transition active:scale-90 disabled:opacity-30 disabled:cursor-not-allowed`}
                                 >
                                   +
@@ -335,14 +366,24 @@ function FourthCard() {
                           ) : (
                             <button
                               onClick={() => {
-                                handleAddToCart(product);
+                                const selectedVariantId =
+                                  selectedVariants[product._id] || (product?.variants?.length > 0 ? product.variants[0]._id : null);
+
+                                handleAddToCart(product, selectedVariantId);
+
                                 if (!user) refreshGuestCart();
                               }}
-                              disabled={(product?.variants?.find(v => v._id === (selectedVariants[product._id] || product.variants[0]._id))?.stock || 0) === 0}
+                              disabled={
+                                (product?.variants?.find((v) => v._id === (selectedVariants[product._id] || product.variants[0]._id))
+                                  ?.stock || 0) === 0
+                              }
                               className={`w-full px-3 py-2 text-sm font-semibold rounded-md transition duration-200 shadow-sm active:scale-95 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed
                                 ${user ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white'}`}
                             >
-                              {(product?.variants?.find(v => v._id === (selectedVariants[product._id] || product.variants[0]._id))?.stock || 0) === 0 ? 'Out of Stock' : 'Add to Cart'}
+                              {(product?.variants?.find((v) => v._id === (selectedVariants[product._id] || product.variants[0]._id))
+                                ?.stock || 0) === 0
+                                ? 'Out of Stock'
+                                : 'Add to Cart'}
                             </button>
                           )}
                         </div>
