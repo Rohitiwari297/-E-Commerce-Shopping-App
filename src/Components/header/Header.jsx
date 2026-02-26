@@ -136,7 +136,7 @@ function Header() {
           </div>
 
           {/* SEARCH (DESKTOP) */}
-          <div className="hidden md:flex flex-1 mx-8 max-w-xl group">
+          <div className="hidden md:flex flex-1 mx-4 max-w-2xl group">
             <div className="relative w-full flex items-center">
               <input
                 type="text"
@@ -157,7 +157,7 @@ function Header() {
           </div>
 
           {/* DESKTOP RIGHT MENU */}
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium">
+          <div className="hidden md:flex items-center gap-6 text-sm font-medium">
             {/* ACCOUNT */}
             {userSession ? (
               <Menu as="div" className="relative">

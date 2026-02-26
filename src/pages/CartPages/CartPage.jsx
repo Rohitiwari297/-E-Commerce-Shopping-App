@@ -288,7 +288,7 @@ function CartPage() {
   };
 
   return (
-    <div className="container mx-auto p-3 sm:p-4 lg:p-6">
+    <div className="py-3 sm:py-4 lg:py-6">
       {(displayItems || []).length === 0 ? (
         /* EMPTY CART UI */
         <div className="flex flex-col items-center justify-center py-16 sm:py-24 text-center">

@@ -35,7 +35,7 @@ export default function SeCarousel() {
   ];
 
   return (
-    <div className="w-full px-4 md:px-6 lg:px-8 mt-6 md:mt-8 lg:mt-10">
+    <div className="mt-4 md:mt-6">
       <Swiper
         modules={[Autoplay, Pagination]}
         slidesPerView={1}
@@ -50,7 +50,7 @@ export default function SeCarousel() {
           clickable: true,
           dynamicBullets: true,
         }}
-        className="max-w-[1400px] mx-auto carousel-slider"
+        className="carousel-slider"
       >
         {sliders.map((slide) => (
           <SwiperSlide key={slide.id}>

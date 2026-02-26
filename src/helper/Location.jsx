@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 function Location() {
   const [open, setOpen] = useState(false);
-  const [location, setLocation] = useState(null);
+  const [location, setLocation] = useState(() => localStorage.getItem('userLocation') || null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -26,12 +26,13 @@ function Location() {
           const locationParts = data.display_name.split(',').map((p) => p.trim());
           console.log('Location data:', data);
           // Extract city or town from the address
-          setLocation(
-            `${locationParts[0]} ${locationParts[3]}, ${locationParts[5]}, ${locationParts[6]}, ${locationParts[7]}` ||
-              data.display_name ||
-              data.address.city_district ||
-              data.address.city,
-          );
+          const formattedLocation = `${locationParts[0]} ${locationParts[3]}, ${locationParts[5]}, ${locationParts[6]}, ${locationParts[7]}` ||
+          data.display_name ||
+          data.address.city_district ||
+          data.address.city;
+          
+          setLocation(formattedLocation);
+          localStorage.setItem('userLocation', formattedLocation);
           setOpen(false);
         } catch (err) {
           setError('Unable to fetch location details.');
