@@ -245,9 +245,9 @@ function CartDrawer({ open, onClose, data = [] }) {
         {/* ================= FOOTER ================= */}
         {localData.length > 0 && (
           <div className="drawer-footer">
-            <Link to="/cartPage" onClick={onClose} className="link-btn">
+            {/* <Link to="/cartPage" onClick={onClose} className="link-btn">
               <button className="btn btn-secondary">View Full Cart</button>
-            </Link>
+            </Link> */}
 
             <button onClick={handlePlaceOrder} className="link-btn">
               <button className="btn btn-primary">{user ? 'Checkout' : 'Login to Order'}</button>

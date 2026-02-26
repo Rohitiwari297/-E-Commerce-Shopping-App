@@ -192,4 +192,33 @@ export const addMoneyInWallet = async (amount) => {
         toast.error(`Error while adding money in wallet, Error: ${error}`);
         return null;
     }
-} 
+}
+
+
+/**
+ * GET ALL COUPONS
+ */
+export const getCoupon = async () => {
+    try {
+        const res = await axiosInstance.get(`/api/coupons`);
+        console.log("couuuupon",res.data.data)
+        return res.data.data
+    } catch (error) {
+        toast.error(`Error while fetching the coupon data, Error: ${error}`)
+    }
+}
+
+
+/**
+ * GET ALL COUPONS
+ */
+export const ApplyCoupon = async (code) => {
+    try {
+        const res = await axiosInstance.post(`/api/coupons/apply`, { code });
+        console.log(res.data)
+        return res.data
+    } catch (error) {
+        toast.error(`Error while fetching the coupon data, Error: ${error}`)
+    }
+}
+
