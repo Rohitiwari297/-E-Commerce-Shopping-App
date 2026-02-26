@@ -7,7 +7,7 @@ import AddressModalPage from '../AddressModalPage'; // import the AddressModalPa
 import { MdCreditCard, MdLocationOn, MdPayments } from 'react-icons/md';
 import { fetchCartAPI, updateCartQuantityAPI } from '../../redux/features/cart/cartSlice';
 import CartItem from './CartItem';
-import { getAddress, placeOrder } from '../../utils/Apis';
+import { getAddress, placeOrder, fetchWalletAmount } from '../../utils/Apis';
 import { getGuestCart } from '../../utils/guestCart';
 import GuestCartItem from './GuestCartItem';
 import toast from 'react-hot-toast';
@@ -133,6 +133,24 @@ function CartPage() {
 
   /**
    *
+   * WALLET BALANCE STATE
+   * ================================
+   *
+   */
+  const [walletBalance, setWalletBalance] = useState(0);
+
+  useEffect(() => {
+    const fetchWallet = async () => {
+      if (user) {
+        const res = await fetchWalletAmount();
+        setWalletBalance(res || 0);
+      }
+    };
+    fetchWallet();
+  }, [user]);
+
+  /**
+   *
    * HANDLER FOR PLACE ORDER
    * ============================
    *
@@ -156,6 +174,18 @@ function CartPage() {
       return;
     }
 
+    // Wallet Balance Check
+    if (paymentMethod === 'Wallet') {
+      if (totalPrice > walletBalance) {
+        toast.error('Insufficient wallet balance!');
+        const confirmAddMoney = window.confirm('Insufficient balance. Would you like to add money to your wallet?');
+        if (confirmAddMoney) {
+          navigate('/delivery/history', { state: { menu: 'wallet' } });
+        }
+        return;
+      }
+    }
+
     // Validate customer name (not empty and meaningful)
     if (!customerName || customerName.trim().length === 0) {
       toast.error('Please enter customer name');
@@ -175,12 +205,12 @@ function CartPage() {
 
     // If all validations pass, place order
     try {
-      await placeOrder(selectedAddress, paymentMethod, customerMobile, customerName);
-      dispatch(fetchCartAPI());
-      toast.success('Order placed successfully!');
-      navigate('/delivery/history');
+      const success = await placeOrder(selectedAddress, paymentMethod, customerMobile, customerName);
+      if (success) {
+        dispatch(fetchCartAPI());
+        navigate('/delivery/history');
+      }
     } catch (error) {
-      toast.error('Failed to place order. Please try again.');
       console.error('Order placement error:', error);
     }
   };
@@ -266,8 +296,8 @@ function CartPage() {
             {/* Payment */}
             <h2 className="font-semibold text-base sm:text-lg mb-3">SELECT PAYMENT METHOD</h2>
 
-            <div className="flex justify-between space-y-2 sm:space-y-3 text-sm">
-              <label className="flex items-center gap-2 cursor-pointer">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-sm mb-4">
+              <label className={`flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-colors ${paymentMethod === 'COD' ? 'border-green-600 bg-green-50' : 'border-gray-200'}`}>
                 <input
                   type="radio"
                   name="payment"
@@ -279,7 +309,7 @@ function CartPage() {
                 Cash on Delivery
               </label>
 
-              <label className="flex items-center gap-2 cursor-pointer">
+              <label className={`flex items-center gap-2 p-2 border rounded-lg cursor-pointer transition-colors ${paymentMethod === 'Online' ? 'border-green-600 bg-green-50' : 'border-gray-200'}`}>
                 <input
                   type="radio"
                   name="payment"
@@ -289,6 +319,26 @@ function CartPage() {
                   className="accent-green-700"
                 />
                 Online Payment
+              </label>
+
+              <label className={`flex items-center justify-between gap-2 p-2 border rounded-lg cursor-pointer transition-colors relative ${paymentMethod === 'Wallet' ? 'border-green-600 bg-green-50' : 'border-gray-200'} ${walletBalance < totalPrice ? 'opacity-70' : ''}`}>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="payment"
+                    value="Wallet"
+                    checked={paymentMethod === 'Wallet'}
+                    onChange={handleSelectedPaymentMethod}
+                    className="accent-green-700"
+                  />
+                  <span>Wallet</span>
+                </div>
+                <span className={`text-[10px] font-bold ${walletBalance < totalPrice ? 'text-red-500' : 'text-green-600'}`}>
+                  ₹{walletBalance}
+                </span>
+                {paymentMethod === 'Wallet' && walletBalance < totalPrice && (
+                  <p className="absolute -bottom-5 left-0 text-[10px] text-red-500 font-bold whitespace-nowrap">Insufficient Balance!</p>
+                )}
               </label>
             </div>
             <div>

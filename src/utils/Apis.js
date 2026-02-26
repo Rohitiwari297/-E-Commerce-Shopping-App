@@ -78,21 +78,21 @@ export const getAddress = async (setAllAddress) => {
 export const placeOrder = async (address, paymentMethod, customerMobile, customerName) => {
     try {
         const res = await axiosInstance.post(`/api/orders/place`, {
-            paymentMethod: paymentMethod,
+            paymentMethod: paymentMethod === 'Wallet' ? 'wallet' : paymentMethod,
             shippingAddress: address,
             customerName: customerName,
-            customerMobile: customerMobile
+            customerMobile: customerMobile,
         });
-        toast.success(res.data.message)
-        console.log(res.data)
-        return
-
+        toast.success(res.data.message);
+        console.log(res.data);
+        return true;
     } catch (error) {
-        console.log(error);
-        toast.error(error.response.data.message)
-        return null;
+        console.log('Order Error:', error);
+        const errorMessage = error.response?.data?.message || error.message || 'Failed to place order';
+        toast.error(errorMessage);
+        return false;
     }
-}
+};
 
 
 export const getOrderHistory = async () => {
@@ -120,3 +120,76 @@ export const getProduct = async (searchQuery) => {
         return [];
     }
 }
+
+
+/**
+ * DELETE ADDRESS BY ID
+ */
+export const deleteAddress = async (id) => {
+    try {
+        const res = await axiosInstance.delete(`/api/users/address/${id}`)
+        console.log("address", res.data)
+        toast.success(res.data.message)
+        getAddress();
+        return;
+    } catch (error) {
+        toast.error(error.message)
+    }
+}
+
+
+/**
+ * GET USER WALLET
+ */
+
+export const fetchWalletAmount = async () => {
+    try {
+        const res = await axiosInstance.get(`/api/users/wallet`);
+        // console.log("wallet amount", res.data.data.walletAmount);
+        return res.data.data.walletAmount;
+    } catch (error) {
+        toast.error(`Error while fetching the wallet amount, Error: ${error}`);
+        return null;
+    }
+};
+
+
+/**
+ * GET USER WALLET
+ */
+
+export const fetchWalletTransaction = async (page = 1, limit = 5) => {
+    try {
+        const res = await axiosInstance.get(`/api/users/wallet/transactions?page=${page}&limit=${limit}`);
+        console.log("wallet transactions", res.data.data.transactions);
+        const transaction = res.data.data.transactions;
+        const finalTransaction = transaction.map((item) => {
+            // console.log("itemmmmmmmm", item);
+            return {
+                ...item,
+                createdAt: new Date(item.createdAt).toLocaleString(),
+            };
+        });
+        return finalTransaction;
+    } catch (error) {
+        toast.error(`Error while fetching the wallet transactions, Error: ${error}`);
+        return null;
+    }
+};
+
+
+/***
+ * ADD MONEY IN WALLET
+ */
+
+export const addMoneyInWallet = async (amount) => {
+    try {
+        const res = await axiosInstance.post(`/api/users/wallet/topup`, { amount: amount })
+        // console.log("add money in wallet", res)
+        toast.success(res.data.message)
+        return res.data;
+    } catch (error) {
+        toast.error(`Error while adding money in wallet, Error: ${error}`);
+        return null;
+    }
+} 
