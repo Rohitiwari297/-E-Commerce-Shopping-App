@@ -26,11 +26,12 @@ function Location() {
           const locationParts = data.display_name.split(',').map((p) => p.trim());
           console.log('Location data:', data);
           // Extract city or town from the address
-          const formattedLocation = `${locationParts[0]} ${locationParts[3]}, ${locationParts[5]}, ${locationParts[6]}, ${locationParts[7]}` ||
-          data.display_name ||
-          data.address.city_district ||
-          data.address.city;
-          
+          const formattedLocation =
+            `${locationParts[0]} ${locationParts[3]}, ${locationParts[5]}, ${locationParts[6]}, ${locationParts[7]}` ||
+            data.display_name ||
+            data.address.city_district ||
+            data.address.city;
+
           setLocation(formattedLocation);
           localStorage.setItem('userLocation', formattedLocation);
           setOpen(false);
@@ -49,7 +50,7 @@ function Location() {
   return (
     <div className="flex flex-col text-xs md:text-sm cursor-pointer relative ml-2 md:ml-5 min-w-max">
       <span className="text-black ml-2 block">
-        <h1 className="font-extrabold text-[12px] md:text-[18px]">Delivery in 8 minutes</h1>
+        <h1 className="font-extrabold text-[12px] md:text-[18px]">Delivery in a minutes</h1>
       </span>
       <div className="px-2 justify-center items-center py-1 align-middle">
         <span

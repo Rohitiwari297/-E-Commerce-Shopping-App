@@ -2,6 +2,9 @@ import toast from "react-hot-toast";
 import axiosInstance from "../api/axiosInstance";
 import axios from "axios";
 
+
+const API_URL = import.meta.env.VITE_OTP_API_URL;
+
 export const getCategories = async ({ setCategoryDetails }) => {
 
     try {
@@ -201,7 +204,7 @@ export const addMoneyInWallet = async (amount) => {
 export const getCoupon = async () => {
     try {
         const res = await axiosInstance.get(`/api/coupons`);
-        console.log("couuuupon",res.data.data)
+        console.log("couuuupon", res.data.data)
         return res.data.data
     } catch (error) {
         toast.error(`Error while fetching the coupon data, Error: ${error}`)
@@ -222,3 +225,22 @@ export const ApplyCoupon = async (code) => {
     }
 }
 
+
+/**
+ * INTEGRATE OPT API
+ */
+export const SendOtp = async (formData) => {
+    console.log('data:', formData);
+
+    const res = await axios.post(
+        API_URL,
+        formData,
+        {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        }
+    );
+
+    return res;
+};

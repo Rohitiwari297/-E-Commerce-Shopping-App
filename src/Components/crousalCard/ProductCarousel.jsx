@@ -41,13 +41,18 @@ export default function ProductCarousel() {
         modules={[Autoplay]}
         className="px-0"
       >
-        {bannersData.map((item) => (
-          <SwiperSlide key={item.id}>
-            <div className="rounded-lg overflow-hidden shadow h-[200px] m-1 flex items-center justify-center">
-              <img src={`${import.meta.env.VITE_BASE_URL}${item.image}`} alt="banner" className="w-full h-full object-cover" />
-            </div>
-          </SwiperSlide>
-        ))}
+        {bannersData.map(
+          (item) =>
+            item.device === 'desktop' && (
+              <SwiperSlide key={item._id}>
+                <img
+                  src={`${import.meta.env.VITE_BASE_URL}${item.image}`}
+                  alt={item.title}
+                  className="w-full h-full object-cover rounded-md"
+                />
+              </SwiperSlide>
+            ),
+        )}
       </Swiper>
     </div>
   );
