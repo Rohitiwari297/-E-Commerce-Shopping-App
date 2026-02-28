@@ -16,7 +16,7 @@ export default function Footer() {
         <div>
           <h3 className="font-bold mb-3">Get to Know Us</h3>
           <ul className="space-y-2 text-sm">
-            <li><a href="#" className="hover:underline">About Us</a></li>
+            <li><Link to="/about-us" className="hover:underline">About Us</Link></li>
             <li><a href="#" className="hover:underline">Careers</a></li>
             <li><a href="#" className="hover:underline">Press Releases</a></li>
             <li><a href="#" className="hover:underline">Science & Research</a></li>
@@ -66,8 +66,8 @@ export default function Footer() {
           <span>© 2025, All rights reserved</span>
         </div>
         <div className="flex gap-4 mt-4 md:mt-0">
-          <a href="#" className="hover:underline">Privacy Notice</a>
-          <a href="#" className="hover:underline">Conditions of Use</a>
+          <Link to="/privacy-notice" className="hover:underline">Privacy Notice</Link>
+          <Link to="/terms-and-conditions" className="hover:underline">Conditions of Use</Link>
           <a href="#" className="hover:underline">Cookies</a>
         </div>
       </div>

@@ -20,6 +20,9 @@ import { useEffect } from 'react';
 import { fetchCartAPI } from './redux/features/cart/cartSlice';
 import { mergeGuestCartToUserCart } from './utils/guestCartHelper';
 import Settings from './pages/Settings';
+import PrivacyNotice from './pages/PrivacyNotice';
+import TermsAndConditions from './pages/TermsAndConditions';
+import AboutUs from './pages/AboutUs';
 
 function App() {
   /**
@@ -64,6 +67,9 @@ function App() {
           <Route path="/search" element={<Search />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/orderHistory/:id" element={<OrderHistory />} />
+          <Route path="/privacy-notice" element={<PrivacyNotice />} />
+          <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+          <Route path="/about-us" element={<AboutUs />} />
         </Routes>
       </main>
       <Footer />
