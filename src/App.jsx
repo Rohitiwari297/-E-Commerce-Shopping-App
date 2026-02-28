@@ -12,7 +12,7 @@ import CartPage from './pages/CartPages/CartPage';
 import DeliveryHistory from './pages/DeliveryHistory';
 import PaymentPage from './pages/PaymentPage';
 import OrderHistory from './pages/OderHistory';
-import AddressModalPage from './pages/AddressModalPage';
+import AddressModalPage from './pages/modals/AddressModalPage';
 import Profile from './pages/Profile';
 import Search from './pages/Search';
 import { useDispatch, useSelector } from 'react-redux';
@@ -62,9 +62,8 @@ function App() {
           <Route path="/delivery/address" element={<AddressModalPage />} />
           <Route path="/delivery/profile" element={<Profile />} />
           <Route path="/search" element={<Search />} />
-          <Route path="/settings" element={<Settings  />} />
-          <Route path="/orderHistory/:id" element={<OrderHistory />} /> 
-
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/orderHistory/:id" element={<OrderHistory />} />
         </Routes>
       </main>
       <Footer />

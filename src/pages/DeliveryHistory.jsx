@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { MapPin, LogOut, ShoppingBag, Settings as SettingsIcon, User, Wallet as WalletIcon } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import DeliveryPage from './DeliveryPage';
-import AddressModalPage from './AddressModalPage';
+import AddressModalPage from './modals/AddressModalPage';
 import Profile from './Profile';
 import Settings from './Settings';
 import Wallet from './Wallet';

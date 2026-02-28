@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { getAddress, saveAddress } from '../utils/Apis';
+import { getAddress, saveAddress } from '../../utils/Apis.js';
 import { Pen, Trash, MapPin } from 'lucide-react';
 import { Button } from '@headlessui/react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import { deleteAddress } from '../utils/Apis';
+import { deleteAddress } from '../../utils/Apis.js';
 
 const AddressModalPage = ({ onClose, onSelectAddress }) => {
   const navigate = useNavigate();
@@ -105,7 +105,7 @@ const AddressModalPage = ({ onClose, onSelectAddress }) => {
                     </div>
 
                     <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
+                      {/* <button
                         onClick={(e) => {
                           e.stopPropagation();
                           toast.error('Work is pending...');
@@ -113,7 +113,7 @@ const AddressModalPage = ({ onClose, onSelectAddress }) => {
                         className="p-2 bg-gray-50 hover:bg-green-50 text-green-600 rounded-xl transition-colors"
                       >
                         <Pen size={14} />
-                      </button>
+                      </button> */}
                       <button
                         onClick={(e) => {
                           e.stopPropagation();

@@ -1,26 +1,21 @@
-import React, { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
-import {
-  Package,
-  Clock,
-  CheckCircle2,
-  XCircle,
-  Truck,
-} from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { getOrderHistory } from "../utils/Apis";
+import { Package, Clock, CheckCircle2, XCircle, Truck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { getOrderHistory } from '../utils/Apis';
+import { handleInvoice } from '../helper/genPdf';
 
 function DeliveryPage() {
   const statusColor = {
-    Delivered: "text-green-600 bg-green-100",
-    "In Transit": "text-blue-600 bg-blue-100",
-    Cancelled: "text-red-600 bg-red-100",
+    Delivered: 'text-green-600 bg-green-100',
+    'In Transit': 'text-blue-600 bg-blue-100',
+    Cancelled: 'text-red-600 bg-red-100',
   };
 
   //for modal
   const [selectOrder, setSelectOrder] = useState(null);
-  console.log("selectOrder", selectOrder);
+  console.log('selectOrder', selectOrder);
 
   const navigate = useNavigate();
 
@@ -30,11 +25,11 @@ function DeliveryPage() {
    *
    */
   const { isLoading, data, isError } = useQuery({
-    queryKey: ["orderHistoryDetails"],
+    queryKey: ['orderHistoryDetails'],
     queryFn: getOrderHistory,
   });
 
-  console.log("orderHistoryDetails", data?.data);
+  console.log('orderHistoryDetails', data?.data);
 
   return (
     // <DeliveryHistory>
@@ -43,7 +38,7 @@ function DeliveryPage() {
         <div className="text-center py-20 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
           <Truck className="mx-auto w-16 h-16 text-gray-300 mb-4" />
           <p className="text-lg font-bold text-gray-400">No deliveries found yet.</p>
-          <button 
+          <button
             onClick={() => navigate('/')}
             className="mt-4 px-6 py-2 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-all"
           >
@@ -64,24 +59,28 @@ function DeliveryPage() {
                     <Package className="text-green-600" size={20} />
                   </div>
                   <div>
-                    <h2 className="font-bold text-gray-800 text-[15px]"> 
-                      Order #{order.orderId}
-                    </h2>
+                    <h2 className="font-bold text-gray-800 text-[15px]">Order #{order.orderId}</h2>
                     <p className="text-[12px] text-gray-400 font-medium">Placed on: {new Date(order.createdAt).toLocaleDateString()}</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-3">
-                  <span className={`px-4 py-1.5 rounded-full text-xs font-bold capitalize flex items-center gap-1.5 
-                    ${order.status === 'delivered' ? 'bg-green-100 text-green-700' : 
-                      order.status === 'pending' ? 'bg-blue-100 text-blue-700' : 
-                      order.status === 'shipped' ? 'bg-yellow-100 text-yellow-700' : 
-                      'bg-red-100 text-red-700'}`}
+                  <span
+                    className={`px-4 py-1.5 rounded-full text-xs font-bold capitalize flex items-center gap-1.5 
+                    ${
+                      order.status === 'delivered'
+                        ? 'bg-green-100 text-green-700'
+                        : order.status === 'pending'
+                          ? 'bg-blue-100 text-blue-700'
+                          : order.status === 'shipped'
+                            ? 'bg-yellow-100 text-yellow-700'
+                            : 'bg-red-100 text-red-700'
+                    }`}
                   >
-                    {order.status === "delivered" && <CheckCircle2 size={14} />}
-                    {order.status === "pending" && <Clock size={14} />}
-                    {order.status === "shipped" && <Truck size={14} />}
-                    {order.status === "cancelled" && <XCircle size={14} />}
+                    {order.status === 'delivered' && <CheckCircle2 size={14} />}
+                    {order.status === 'pending' && <Clock size={14} />}
+                    {order.status === 'shipped' && <Truck size={14} />}
+                    {order.status === 'cancelled' && <XCircle size={14} />}
                     {order.status}
                   </span>
                 </div>
@@ -92,9 +91,12 @@ function DeliveryPage() {
                 <div className="flex items-center gap-3">
                   <div className="flex -space-x-4 hover:space-x-2 transition-all duration-500">
                     {order.items.slice(0, 3).map((item, idx) => (
-                      <div key={idx} className="relative z-[idx] w-16 h-16 rounded-2xl bg-white border-4 border-white shadow-sm overflow-hidden group-hover:rotate-3 transition-all">
+                      <div
+                        key={idx}
+                        className="relative z-[idx] w-16 h-16 rounded-2xl bg-white border-4 border-white shadow-sm overflow-hidden group-hover:rotate-3 transition-all"
+                      >
                         <img
-                          src={`${import.meta.env.VITE_BASE_URL}${item?.product?.images?.[0] || ""}`}
+                          src={`${import.meta.env.VITE_BASE_URL}${item?.product?.images?.[0] || ''}`}
                           alt={item.name}
                           className="w-full h-full object-cover"
                         />
@@ -106,9 +108,21 @@ function DeliveryPage() {
                       </div>
                     )}
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-bold text-gray-700"> {order.items.length} Items</p>
-                    <p className="text-lg font-black text-green-600">₹{order.totalPrice}</p>
+                  <div className="flex w-full lg:w-auto md:flex-col lg:flex-col">
+                    <div>
+                      <p className="text-sm font-bold text-gray-700"> {order.items.length} Items</p>
+                      <p className="text-lg font-black text-green-600">₹{order.totalPrice}</p>
+                    </div>
+                    <div className="">
+                      <p className="text-sm font-bold text-gray-700">
+                        {' '}
+                        Scheduled Slot: <span className=" font-black text-green-600">{order.scheduledSlot?.label}</span>
+                      </p>
+                      <p className="text-sm font-bold text-gray-700">
+                        {' '}
+                        Payment Method: <span className="font-black text-green-600">{order.paymentMethod}</span>
+                      </p>
+                    </div>
                   </div>
                 </div>
 
@@ -133,21 +147,21 @@ function DeliveryPage() {
                 <div className="flex items-center gap-2 text-sm">
                   {order.status === 'delivered' ? (
                     <p className="text-green-600 font-bold flex items-center gap-2">
-                       <CheckCircle2 size={16} /> Delivered successfully
+                      <CheckCircle2 size={16} /> Delivered successfully
                     </p>
                   ) : order.status === 'cancelled' ? (
                     <p className="text-red-500 font-bold flex items-center gap-2">
-                       <XCircle size={16} /> Order Cancelled
+                      <XCircle size={16} /> Order Cancelled
                     </p>
                   ) : (
                     <p className="text-blue-600 font-bold flex items-center gap-2 italic">
-                       <Clock size={16} /> Delivery reaching soon
+                      <Clock size={16} /> Delivery reaching soon
                     </p>
                   )}
                 </div>
-                
-                <button 
-                  onClick={() => navigate("/orderHistory/" + order._id)}
+
+                <button
+                  onClick={() => navigate('/orderHistory/' + order._id)}
                   className="text-xs font-bold text-gray-400 hover:text-green-600 transition-colors uppercase tracking-widest"
                 >
                   View Details →
@@ -162,36 +176,22 @@ function DeliveryPage() {
       {selectOrder && (
         <div className="fixed inset-0 bg-blend-luminosity bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-96 p-6 relative">
-            <h3 className="text-lg font-semibold mb-3 text-gray-800">
-              Tracking Order – {selectOrder.orderId}
-            </h3>
+            <h3 className="text-lg font-semibold mb-3 text-gray-800">Tracking Order – {selectOrder.orderId}</h3>
             <p className="text-gray-600 mb-2">
-              Total Products:{" "}
-              <span className="font-medium">{selectOrder.items.length} items</span>
+              Total Products: <span className="font-medium">{selectOrder.items.length} items</span>
             </p>
             <p className="text-gray-600 mb-2">
-              Delivery Address Id:{" "}
-              <span className="font-medium text-[15px]">{selectOrder.shippingAddress}</span>
+              Delivery Address Id: <span className="font-medium text-[15px]">{selectOrder.shippingAddress}</span>
             </p>
             <p className="text-gray-600 mb-4">
-              Order Status:{" "}
-              <span
-                className={`font-semibold ${statusColor[selectOrder.status]}`}
-              >
-                {selectOrder.status}
-              </span>
+              Order Status: <span className={`font-semibold ${statusColor[selectOrder.status]}`}>{selectOrder.status}</span>
             </p>
 
-            <button
-              onClick={() => setSelectOrder(null)}
-              className="absolute top-2 right-3 text-gray-500 hover:text-red-600 text-lg"
-            >
+            <button onClick={() => setSelectOrder(null)} className="absolute top-2 right-3 text-gray-500 hover:text-red-600 text-lg">
               ✕
             </button>
 
-            <div className="text-sm text-gray-500 border-t pt-3 mt-4">
-              Last updated: {selectOrder.updatedAt}
-            </div>
+            <div className="text-sm text-gray-500 border-t pt-3 mt-4">Last updated: {selectOrder.updatedAt}</div>
           </div>
         </div>
       )}

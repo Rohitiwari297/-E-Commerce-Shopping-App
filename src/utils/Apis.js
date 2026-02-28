@@ -78,13 +78,23 @@ export const getAddress = async (setAllAddress) => {
 }
 
 
-export const placeOrder = async (address, paymentMethod, customerMobile, customerName) => {
+export const placeOrder = async (address, paymentMethod, customerMobile, customerName, selectedDate, selectedTimeSlot) => {
+    // SPLIT TIME SLOT IN START TIME AND END TIME
+    const [startTime, endTime] = selectedTimeSlot.split(" - ")
+    console.log("startTime", startTime)
+    console.log("endTime", endTime)
     try {
         const res = await axiosInstance.post(`/api/orders/place`, {
             paymentMethod: paymentMethod === 'Wallet' ? 'wallet' : paymentMethod,
             shippingAddress: address,
             customerName: customerName,
             customerMobile: customerMobile,
+            scheduledSlot: {
+                data: selectedDate,
+                label: selectedTimeSlot,
+                startTime,
+                endTime
+            }
         });
         toast.success(res.data.message);
         console.log(res.data);

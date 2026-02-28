@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
-import AddressModalPage from '../AddressModalPage'; // import the AddressModalPage component
+import AddressModalPage from '../modals/AddressModalPage'; // import the AddressModalPage component
 import { MdCreditCard, MdLocationOn, MdPayments } from 'react-icons/md';
 import { fetchCartAPI, updateCartQuantityAPI } from '../../redux/features/cart/cartSlice';
 import CartItem from './CartItem';
@@ -12,7 +12,8 @@ import { getUserDetails } from '../../redux/features/user/userSlice';
 import { getGuestCart } from '../../utils/guestCart';
 import GuestCartItem from './GuestCartItem';
 import toast from 'react-hot-toast';
-import CouponModalPage from './CouponModalPage'; // Import CouponModalPage
+import CouponModalPage from '../modals/CouponModalPage'; // Import CouponModalPage
+import ScheduleModalPage from '../modals/ScheduleModalPage';
 
 function CartPage() {
   /**
@@ -105,7 +106,7 @@ function CartPage() {
     const orig = variant?.originalPrice || i?.productId?.originalPrice || i.originalPrice || 0;
     const price = variant?.price || i?.productId?.price || i.price || 0;
     // ensure we don't return 0 if originalPrice is missing
-    const basePrice = (orig && orig > price) ? orig : price;
+    const basePrice = orig && orig > price ? orig : price;
     return acc + (basePrice || 0) * (i.quantity || 1);
   }, 0);
 
@@ -141,6 +142,34 @@ function CartPage() {
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [customerMobile, setCustomerMobile] = useState('');
   const [customerName, setCustomerName] = useState('');
+
+  /**
+   * COUPON STATE
+   * ================================
+   */
+  const [coupon, setCoupon] = useState('');
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [openCouponModal, setOpenCouponModal] = useState(false);
+
+  /**
+   * SCHEDULE STATE
+   * ================================
+   */
+  const [openScheduleModal, setOpenScheduleModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
+
+  /**
+   * SCHEDULE DELIVERY HANDLER
+   * ================================
+   */
+  const handleSelectedTimeDate = (date, time) => {
+    console.log('selectedDate', date);
+    console.log('selectedTimeSlot', time);
+    setSelectedDate(date);
+    setSelectedTimeSlot(time);
+  };
 
   useEffect(() => {
     if (user && !userData) {
@@ -253,7 +282,7 @@ function CartPage() {
 
     // If all validations pass, place order
     try {
-      const success = await placeOrder(selectedAddress, paymentMethod, customerMobile, customerName);
+      const success = await placeOrder(selectedAddress, paymentMethod, customerMobile, customerName, selectedDate, selectedTimeSlot);
       if (success) {
         dispatch(fetchCartAPI());
         navigate('/delivery/history');
@@ -262,15 +291,6 @@ function CartPage() {
       console.error('Order placement error:', error);
     }
   };
-
-  /**
-   * COUPON STATE
-   * ================================
-   */
-  const [coupon, setCoupon] = useState('');
-  const [couponDiscount, setCouponDiscount] = useState(0);
-  const [appliedCoupon, setAppliedCoupon] = useState(null);
-  const [openCouponModal, setOpenCouponModal] = useState(false);
 
   // Placeholder for setCoupons if still needed, though CouponModalPage handles its own fetch
   const [coupons, setCoupons] = useState([]);
@@ -431,7 +451,7 @@ function CartPage() {
               </label>
 
               <label
-                className={`flex items-center justify-between gap-2 p-2 border rounded-lg cursor-pointer transition-colors relative ${paymentMethod === 'Wallet' ? 'border-green-600 bg-green-50' : 'border-gray-200'} ${walletBalance < (calculatedTotalPrice - couponDiscount) ? 'opacity-70' : ''}`}
+                className={`flex items-center justify-between gap-2 p-2 border rounded-lg cursor-pointer transition-colors relative ${paymentMethod === 'Wallet' ? 'border-green-600 bg-green-50' : 'border-gray-200'} ${walletBalance < calculatedTotalPrice - couponDiscount ? 'opacity-70' : ''}`}
               >
                 <div className="flex items-center gap-2">
                   <input
@@ -444,10 +464,12 @@ function CartPage() {
                   />
                   <span>Wallet</span>
                 </div>
-                <span className={`text-[10px] font-bold ${walletBalance < (calculatedTotalPrice - couponDiscount) ? 'text-red-500' : 'text-green-600'}`}>
+                <span
+                  className={`text-[10px] font-bold ${walletBalance < calculatedTotalPrice - couponDiscount ? 'text-red-500' : 'text-green-600'}`}
+                >
                   ₹{walletBalance}
                 </span>
-                {paymentMethod === 'Wallet' && walletBalance < (calculatedTotalPrice - couponDiscount) && (
+                {paymentMethod === 'Wallet' && walletBalance < calculatedTotalPrice - couponDiscount && (
                   <p className="absolute -bottom-5 left-0 text-[10px] text-red-500 font-bold whitespace-nowrap">Insufficient Balance!</p>
                 )}
               </label>
@@ -482,12 +504,20 @@ function CartPage() {
               </div>
             </div>
 
-            <button
-              onClick={handlePlaceOrder}
-              className="w-full mt-4 bg-green-700 text-white p-3 rounded font-semibold hover:bg-green-800 text-sm sm:text-base"
-            >
-              PLACE ORDER
-            </button>
+            <div className="flex flex-col ">
+              <button
+                onClick={() => setOpenScheduleModal(true)}
+                className="w-full mt-4 bg-gray-400 text-white p-3 rounded font-semibold hover:bg-gray-500 text-sm sm:text-base"
+              >
+                SCHEDULE ORDER
+              </button>
+              <button
+                onClick={handlePlaceOrder}
+                className="w-full mt-4 bg-green-700 text-white p-3 rounded font-semibold hover:bg-green-800 text-sm sm:text-base"
+              >
+                PLACE ORDER
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -521,11 +551,24 @@ function CartPage() {
             outline: 'none',
           }}
         >
-          <CouponModalPage
-            onClose={() => setOpenCouponModal(false)}
-            onApply={handleApplyCouponSuccess}
-            totalPrice={calculatedTotalPrice}
-          />
+          <CouponModalPage onClose={() => setOpenCouponModal(false)} onApply={handleApplyCouponSuccess} totalPrice={calculatedTotalPrice} />
+        </Box>
+      </Modal>
+
+      {/* SCHEDULE MODAL */}
+      <Modal open={openScheduleModal} onClose={() => setOpenScheduleModal(false)}>
+        <Box
+          sx={{
+            width: { xs: '90%', sm: '70%', md: '500px' },
+            p: 0, // removed padding for custom modal styling
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            outline: 'none',
+          }}
+        >
+          <ScheduleModalPage onClose={() => setOpenScheduleModal(false)} onApply={handleSelectedTimeDate} />
         </Box>
       </Modal>
     </div>
