@@ -23,6 +23,8 @@ import Settings from './pages/Settings';
 import PrivacyNotice from './pages/PrivacyNotice';
 import TermsAndConditions from './pages/TermsAndConditions';
 import AboutUs from './pages/AboutUs';
+import SellOnPlatform from './pages/SellOnPlatform';
+import ScrollToTop from './helper/ScrollToTop';
 
 function App() {
   /**
@@ -50,6 +52,7 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <ScrollToTop />
       <Header />
       <main className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-x-hidden">
         <Routes>
@@ -70,6 +73,7 @@ function App() {
           <Route path="/privacy-notice" element={<PrivacyNotice />} />
           <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
           <Route path="/about-us" element={<AboutUs />} />
+          <Route path="/seller" element={<SellOnPlatform />} />
         </Routes>
       </main>
       <Footer />

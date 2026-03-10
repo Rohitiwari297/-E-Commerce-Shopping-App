@@ -254,3 +254,25 @@ export const SendOtp = async (formData) => {
 
     return res;
 };
+
+
+/**
+ * INTEGRATE SELLER REGISTRATION API
+ */
+
+export const SellerRegister = async (formData) => {
+    try {
+        const res = await axios.post('http://localhost:5000/api/seller/register',
+            formData,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            }
+        );
+        return res;
+    } catch (error) {
+        console.error("SellerRegister Error:", error);
+        return error.response || { status: 500, data: { message: error.message } };
+    }
+}
